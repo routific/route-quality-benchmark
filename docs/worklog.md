@@ -5,6 +5,36 @@ research write-up (Slices 6–7). Newest first.
 
 ---
 
+## 2026-07-01 — Slice 4 (scoped to 5 instances): batch runner + results
+
+**Goal.** Generate real cross-solver results on a small sample (5 instances) to unblock Slice 5
+(metrics), rather than running the full 200.
+
+**What was built.**
+- [`run_benchmark.py`](../run_benchmark.py) — brings each solver's Docker service up, solves a set of
+  instances via the solver's `run.py` (→ `results/<solver>/<instance>.json`), tears it down. Defaults
+  to a 5-instance sample (one per VRP type, all ≤400 stops). jsprit auto-skips >400.
+- [`tools/import_routific_results.py`](../tools/import_routific_results.py) — pulls Routific's
+  precomputed solutions from the internal benchmark DB (v3 isn't runnable) and converts the stored
+  `{start_time, permutation}` arrays to Standard Solutions.
+
+**Ran** the 4 competitors over the 5-instance sample (4 s budget for the anytime solvers) → 20 valid
+Standard Solutions in `results/{vroom,pyvrp,ortools,jsprit}/`. All complete, in-range, no duplicates.
+
+**Routific comparability issue (found + decided).** Imported Routific LS (bench 2078) + GA (2079), but
+they solved the **priority-aware** internal instance, while the published Standard Instance is
+**priority-free** (we dropped `priority`) — e.g. pb-0187 has priorities `{20,7,1,5}`, and Routific left
+10 unserved vs competitors' 6 (it optimized priority-weighted, not raw count). Runtimes also differ
+(Routific ~44 ms vs the 4 s competitor budget). So **the old Routific results are NOT comparable to the
+standard-instance competitor results.** Decision (Rodrigo): **proceed to Slice 5 on the 4 competitors**
+(mutually comparable); Routific LS/GA kept but **labeled `meta.provisional=true`**. Proper fix = run v3
+on the Standard Instances (priority-free, comparable budget) — a follow-up.
+
+**Note.** `results/` is git-ignored (local run artifacts). Published results (incl. a valid Routific
+run) will be committed once regenerated.
+
+---
+
 ## 2026-07-01 — Slice 3: Solver harnesses (VROOM, PyVRP, OR-Tools, jsprit)
 
 **Goal.** Package the four open-source competitors so each runs on a fresh machine via Docker and
