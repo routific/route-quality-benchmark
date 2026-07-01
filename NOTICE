@@ -1,0 +1,39 @@
+Routing Quality Benchmark
+Copyright 2026 Routific
+
+This product includes software developed at Routific, licensed under the
+Apache License, Version 2.0 (see LICENSE).
+
+============================================================================
+Datasets
+============================================================================
+
+The datasets under datasets/ are NOT covered by the Apache License. The
+`public-benchmark` dataset is licensed under Creative Commons
+Attribution-NonCommercial 4.0 International (CC BY-NC 4.0); see
+datasets/public-benchmark/LICENSE.
+
+Required attribution for the dataset:
+  "public-benchmark dataset © Routific, licensed CC BY-NC 4.0."
+
+============================================================================
+OpenStreetMap (required attribution)
+============================================================================
+
+The travel-time matrices in every dataset are computed with OSRM over
+OpenStreetMap data and constitute a Produced Work under the ODbL. Any use or
+redistribution must retain the following attribution:
+
+  "Produced using street network data that is © OpenStreetMap contributors,
+   available under the Open Database License (ODbL)."
+
+  https://www.openstreetmap.org/copyright
+
+============================================================================
+Third-party solvers
+============================================================================
+
+Solver harnesses (added in a later slice) package third-party open-source
+solvers (VROOM, PyVRP, OR-Tools, JSprit), each under its own upstream license.
+Those solvers are pulled/built at runtime and are not redistributed here; their
+license notices will be listed in THIRD-PARTY.md.

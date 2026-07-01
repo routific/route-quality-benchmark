@@ -1,0 +1,10 @@
+# Private provenance / internal inputs — never publish
+tools/_private/
+datasets/**/_provenance.private.csv
+
+# Python
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store

@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://routific.com/benchmark/schema/v1/solution.schema.json",
+  "title": "Standard VRP Benchmark Solution (v1)",
+  "type": "object",
+  "required": ["instance", "solver", "routes", "unserved"],
+  "additionalProperties": false,
+  "properties": {
+    "instance": { "type": "string", "description": "The Standard Instance 'name' this solves." },
+    "solver": { "type": "string", "description": "Solver identifier, e.g. vroom | pyvrp | ortools | jsprit | routific-v3." },
+    "routes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["vehicle", "visits"],
+        "additionalProperties": false,
+        "properties": {
+          "vehicle": { "type": "integer", "minimum": 0, "description": "Index into instance.vehicles." },
+          "start_time": { "type": ["integer", "null"], "description": "Route start, seconds." },
+          "visits": {
+            "type": "array",
+            "description": "Ordered permutation of indices into instance.visits.",
+            "items": { "type": "integer", "minimum": 0 }
+          }
+        }
+      }
+    },
+    "unserved": {
+      "type": "array",
+      "description": "Indices into instance.visits left unassigned.",
+      "items": { "type": "integer", "minimum": 0 }
+    },
+    "runtime_ms": { "type": ["integer", "null"], "description": "Algorithm solve time (exclude network/IO)." },
+    "meta": { "type": "object", "additionalProperties": true }
+  }
+}

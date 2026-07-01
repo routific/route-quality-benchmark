@@ -1,0 +1,17 @@
+{
+  "instance": "example-cvrptw-0001",
+  "solver": "example-solver",
+  "routes": [
+    {
+      "vehicle": 0,
+      "start_time": 30000,
+      "visits": [0, 1]
+    }
+  ],
+  "unserved": [],
+  "runtime_ms": 12,
+  "meta": {
+    "total_travel_time": 1440,
+    "vehicles_used": 1
+  }
+}

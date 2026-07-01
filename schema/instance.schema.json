@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://routific.com/benchmark/schema/v1/instance.schema.json",
+  "title": "Standard VRP Benchmark Instance (v1)",
+  "type": "object",
+  "required": ["name", "type", "locations", "vehicles", "visits", "distances", "minimize_vehicles"],
+  "additionalProperties": false,
+  "properties": {
+    "name": { "type": "string", "description": "Stable opaque public instance id (no PII)." },
+    "type": {
+      "type": "string",
+      "enum": ["tsp", "vrp", "cvrp", "vrptw", "cvrptw", "pdp", "pdptw"]
+    },
+    "locations": {
+      "type": "array",
+      "description": "Index space. Geomasked coordinates only; no address/name.",
+      "items": {
+        "type": "object",
+        "required": ["lat", "lng"],
+        "additionalProperties": false,
+        "properties": {
+          "lat": { "type": "number" },
+          "lng": { "type": "number" }
+        }
+      }
+    },
+    "vehicles": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "shift_start_time"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string" },
+          "start_location": { "type": ["integer", "null"] },
+          "end_location": { "type": ["integer", "null"] },
+          "shift_start_time": { "type": "integer" },
+          "shift_end_time": { "type": ["integer", "null"] },
+          "capacity": { "$ref": "#/$defs/quantity" }
+        }
+      }
+    },
+    "visits": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "location", "duration"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string" },
+          "location": { "type": "integer", "minimum": 0 },
+          "duration": { "type": "integer", "minimum": 0 },
+          "time_windows": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "start": { "type": ["integer", "null"] },
+                "end": { "type": ["integer", "null"] }
+              }
+            }
+          },
+          "demand": { "$ref": "#/$defs/quantity" },
+          "precedence": { "type": ["null", "object"] }
+        }
+      }
+    },
+    "distances": {
+      "type": "array",
+      "description": "N x N raw-OSRM travel time in seconds (N = locations.length).",
+      "items": { "type": "array", "items": { "type": "integer", "minimum": 0 } }
+    },
+    "minimize_vehicles": { "type": "boolean", "description": "The one retained objective flag." }
+  },
+  "$defs": {
+    "quantity": {
+      "description": "Scalar (single dimension), typed object (multi-dimension), or null.",
+      "anyOf": [
+        { "type": "number" },
+        { "type": "object", "additionalProperties": { "type": "number" } },
+        { "type": "null" }
+      ]
+    }
+  }
+}

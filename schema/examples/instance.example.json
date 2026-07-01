@@ -1,0 +1,43 @@
+{
+  "name": "example-cvrptw-0001",
+  "type": "cvrptw",
+  "locations": [
+    { "lat": 43.0727, "lng": -89.3839 },
+    { "lat": 43.0812, "lng": -89.3765 },
+    { "lat": 43.0699, "lng": -89.4012 }
+  ],
+  "vehicles": [
+    {
+      "id": "veh-0",
+      "start_location": 0,
+      "end_location": 0,
+      "shift_start_time": 28800,
+      "shift_end_time": 61200,
+      "capacity": 100
+    }
+  ],
+  "visits": [
+    {
+      "id": "visit-0",
+      "location": 1,
+      "duration": 300,
+      "time_windows": [{ "start": 32400, "end": 46800 }],
+      "demand": 20,
+      "precedence": null
+    },
+    {
+      "id": "visit-1",
+      "location": 2,
+      "duration": 300,
+      "time_windows": [{ "start": 36000, "end": 50400 }],
+      "demand": 35,
+      "precedence": null
+    }
+  ],
+  "distances": [
+    [0, 540, 720],
+    [560, 0, 900],
+    [700, 880, 0]
+  ],
+  "minimize_vehicles": true
+}
