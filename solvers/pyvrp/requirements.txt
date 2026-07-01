@@ -1,0 +1,4 @@
+# PyVRP hybrid-genetic-search VRP solver. 0.11.x is the series validated for this
+# harness; bump deliberately (the route-index convention is version-sensitive —
+# see _extract in solve.py).
+pyvrp>=0.11,<0.12

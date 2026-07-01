@@ -15,9 +15,20 @@ fleet utilization.
 |---|---|
 | [`docs/standard-io-contract.md`](docs/standard-io-contract.md) | **The foundation** — the Standard Instance & Standard Solution formats every dataset/solver/metric conforms to. |
 | [`schema/`](schema/) | JSON Schemas + worked examples for the contract. |
-| `datasets/` | Published benchmark datasets as plain files (coming in Slice 2). |
-| `solvers/` | Dockerized open-source solver harnesses (coming in Slice 3). |
+| [`datasets/`](datasets/) | Published benchmark datasets as plain files. |
+| [`solvers/`](solvers/) | Dockerized open-source solver harnesses (VROOM, PyVRP, OR-Tools, jsprit). |
+| `results/` | Where solver runs are written (`results/<solver>/<instance>.json`); git-ignored. |
 | `tools/` | Internal tooling used to build the published artifacts. |
+
+## Running a solver
+
+```bash
+cd solvers/vroom && docker compose up -d          # one service per solver dir
+python3 run.py ../../datasets/public-benchmark/tsp/pb-0187.json.gz
+# -> results/vroom/pb-0187.json  (a Standard Solution)
+```
+
+See [`solvers/README.md`](solvers/README.md) for the full interface and per-solver notes.
 
 ## Reproducibility model
 

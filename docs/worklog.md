@@ -5,6 +5,44 @@ research write-up (Slices 6–7). Newest first.
 
 ---
 
+## 2026-07-01 — Slice 3: Solver harnesses (VROOM, PyVRP, OR-Tools, jsprit)
+
+**Goal.** Package the four open-source competitors so each runs on a fresh machine via Docker and
+speaks the Standard I/O contract (Standard Instance → Standard Solution). Extracted from four separate
+branches in `routing-engine-api` (`rout-2722` / `rout-2728` / `rout-2723` / `origin/ROUT-2725`).
+
+**What was built.**
+- [`solvers/common/standard_io.py`](../solvers/common/standard_io.py) — load instance (`.json`/`.gz`),
+  write solution, coverage-check.
+- **VROOM** (`solvers/vroom/`) — prebuilt image `vroom-docker:v1.15.0`, HTTP :3030; client-side
+  `adapter.py` (custom-matrix). `explore: 2` (matches published results).
+- **PyVRP** (`solvers/pyvrp/`) — built image (python:3.12 + `pyvrp`), HTTP :5002; reuses the internal
+  `solve.py` Model builder + a Standard-contract server. Needs a C++ toolchain on arm64 (no aarch64
+  wheel) — Dockerfile adds `build-essential`.
+- **OR-Tools** (`solvers/ortools/`) — built image (+ `ortools`), HTTP :5001; same server pattern.
+- **jsprit** (`solvers/jsprit/`) — Java service (gradle shadowJar → JRE), HTTP :8080; client-side
+  `adapter.py`. Single capacity dimension (typed collapsed to scalar); ≲400-stop cap; no self-reported
+  solve time (client wall-clock).
+- [`THIRD-PARTY.md`](../THIRD-PARTY.md) — upstream licenses (VROOM BSD-2, PyVRP MIT, OR-Tools Apache-2,
+  jsprit Apache-2) + jsprit's Javalin/Jackson/SLF4J.
+
+**`minimize_vehicles` (Rodrigo's correctness note, applied to all solvers).** When set, each solver
+charges a per-vehicle fixed cost calibrated *below the value of serving a visit*, so it consolidates
+routes but never drops a servable stop to save a vehicle (**serve > vehicles > travel time**). VROOM
+had this gap (its default minimizes travel time, not vehicle count) — added `costs.fixed`; verified it
+cut routes 2→1 with unserved unchanged. PyVRP (`fixed_cost` < prize) and OR-Tools (fixed cost < drop
+penalty) already had it; jsprit uses `maxCost×20`.
+
+**Verification.** Every solver ran the 5 constraint types (tsp/vrp/cvrp/vrptw/cvrptw) → all produced
+valid Standard Solutions (in-range indices, full coverage, no duplicates). Cross-check on a
+minimize-vehicles instance: PyVRP/OR-Tools → 1 route, VROOM/jsprit → 2 routes, all with the same 1
+unserved — the real solver-quality spread the benchmark measures.
+
+**Deferred.** A batch runner over the whole dataset + Routific's own results = Slice 4. jsprit's
+≲400-stop skip is enforced there.
+
+---
+
 ## 2026-07-01 — Slice 2: Publish the `public-benchmark` dataset
 
 **Goal.** Export the 200 `public-benchmark` instances to files that conform to the Slice-1 contract,

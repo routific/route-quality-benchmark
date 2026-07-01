@@ -1,0 +1,3 @@
+# Google OR-Tools routing solver. 9.11.x–9.12.x is the series validated for this
+# harness; bump deliberately.
+ortools>=9.11,<9.13

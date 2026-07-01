@@ -1,0 +1,12 @@
+# OR-Tools HTTP service (built from ./Dockerfile).
+#
+#   docker compose up -d --build
+#   python3 run.py ../../datasets/public-benchmark/tsp/pb-0187.json.gz
+#
+services:
+  ortools:
+    build: .
+    container_name: rqb-ortools
+    ports:
+      - "5001:5001"
+    restart: unless-stopped

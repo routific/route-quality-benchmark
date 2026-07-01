@@ -1,0 +1,19 @@
+# VROOM in custom-matrix mode: no OSRM/map backend — each request carries the
+# instance's raw-OSRM duration matrix, so VROOM is featherweight and runs on a
+# laptop.
+#
+#   docker compose up -d
+#   python3 run.py ../../datasets/public-benchmark/tsp/pb-0054.json.gz
+#
+# Host port 3030 (leaves 3000 free).
+services:
+  vroom:
+    image: ghcr.io/vroom-project/vroom-docker:v1.15.0
+    container_name: rqb-vroom
+    environment:
+      - VROOM_ROUTER=osrm   # selects the routingServers block; never called in matrix mode
+    ports:
+      - "3030:3000"
+    volumes:
+      - ./conf:/conf
+    restart: unless-stopped

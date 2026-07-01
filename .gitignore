@@ -8,3 +8,9 @@ __pycache__/
 
 # OS
 .DS_Store
+
+# Solver runtime logs (e.g. VROOM access.log written into the mounted conf dir)
+*.log
+
+# Local solver run outputs (published results ship separately)
+results/

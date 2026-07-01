@@ -1,0 +1,13 @@
+# jsprit HTTP service (Java). Multi-stage build: gradle shadowJar -> JRE runtime.
+# First build downloads gradle + jsprit/javalin deps (a few minutes).
+#
+#   docker compose up -d --build
+#   python3 run.py ../../datasets/public-benchmark/tsp/pb-0187.json.gz
+#
+services:
+  jsprit:
+    build: .
+    container_name: rqb-jsprit
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
