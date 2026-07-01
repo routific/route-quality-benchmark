@@ -5,6 +5,44 @@ research write-up (Slices 6–7). Newest first.
 
 ---
 
+## 2026-07-01 — Slice 5: comparison analyzer (no composite score)
+
+**Goal (per Rodrigo).** Not a single score — a **comparison** across solvers of travel time + the
+route-quality metrics (crossings between/within routes, workload imbalance, route-duration variance,
+idle time) + vehicle count.
+
+**What was built.**
+- [`analysis/compute_metrics.py`](../analysis/compute_metrics.py) — recomputes every metric from an
+  `(instance, solution)` pair alone, **ported to match `engine-bench analyze compute`**
+  (engine-lib `fitness.rs` + routing-engine-api `solution_timeline.rs`/`utils.rs`).
+- [`analysis/analyze.py`](../analysis/analyze.py) — aggregates `results/<solver>/<instance>.json` into a
+  per-metric mean table + a win-rate table; writes `results/_analysis/*.csv`.
+  `--include-provisional` also shows routific-* (flagged not-comparable).
+- [`analysis/README.md`](../analysis/README.md) — formal definitions + grounding in Rossit et al. (2019)
+  visual-attractiveness (compactness / non-crossing / low-complexity).
+
+**Metric correction (Rodrigo caught the first version was wrong).** My initial guesses didn't match the
+engine. Fixed to the real formulas: **workload_imbalance = Σ|route visit-count − avg visit-count|**
+(`fitness.deviation_from_balance`, balances stop *count*, not time); **route_duration_variance =
+max − min of (travel+service+idle)** per route (`fitness.max_duration_variance`, a *range*, not a
+statistical variance); **inter-route crossings only between ADJACENT routes** (nearest-neighbor
+`VehicleAdjacency` + full-connect), visit-legs only; intra-route excludes the first↔last wrap. Fidelity
+gap: `reroute_incompatible_edges` not ported.
+
+**Runtime removed (was misleading).** The runtime column measured different things per solver (VROOM's
+own solve time at fixed `explore` effort ≈ ms; PyVRP/OR-Tools a **flat, arbitrary 4 s budget I set**;
+jsprit client wall-clock incl. HTTP, capped at 2000 iterations). Not a fair speed comparison, so it's
+dropped from the analyzer. Returns with (a) one clock (server-side pure solve time) + (b) a per-problem
+budget from a valid Routific run (internal benchmark uses ≈2× EngineV3's per-problem runtime).
+
+**Run (4 competitors × 5 instances).** VROOM lowest travel + zero inter-route crossings; jsprit worst on
+crossings. Tables reproduce the target format.
+
+**Open items.** Routific column stays provisional until v3 is re-run on the Standard Instances; add a
+fair runtime protocol; scale 5 → full 200 when ready.
+
+---
+
 ## 2026-07-01 — Slice 4 (scoped to 5 instances): batch runner + results
 
 **Goal.** Generate real cross-solver results on a small sample (5 instances) to unblock Slice 5
