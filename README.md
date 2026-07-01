@@ -17,18 +17,28 @@ fleet utilization.
 | [`schema/`](schema/) | JSON Schemas + worked examples for the contract. |
 | [`datasets/`](datasets/) | Published benchmark datasets as plain files. |
 | [`solvers/`](solvers/) | Dockerized open-source solver harnesses (VROOM, PyVRP, OR-Tools, jsprit). |
-| `results/` | Where solver runs are written (`results/<solver>/<instance>.json`); git-ignored. |
+| `run_benchmark.py` | One-command batch runner (all solvers over a set of instances). |
+| [`analysis/`](analysis/) | The comparison analyzer + metric definitions. |
+| `results/` | Where solver runs + analysis land (git-ignored). |
+| [`RUNNING.md`](RUNNING.md) | **Step-by-step guide** to run the solvers + analysis end to end. |
 | `tools/` | Internal tooling used to build the published artifacts. |
 
-## Running a solver
+## Quickstart
+
+**Full step-by-step walkthrough: [`RUNNING.md`](RUNNING.md)** — prerequisites, running every solver, and
+the analysis. In short (needs Docker + Python 3; the runner and analyzer use only the standard library):
 
 ```bash
-cd solvers/vroom && docker compose up -d          # one service per solver dir
-python3 run.py ../../datasets/public-benchmark/tsp/pb-0187.json.gz
-# -> results/vroom/pb-0187.json  (a Standard Solution)
+python3 run_benchmark.py        # run the 4 solvers on a 5-instance sample -> results/<solver>/…
+python3 analysis/analyze.py     # compare them -> results/_analysis/*.csv
 ```
 
-See [`solvers/README.md`](solvers/README.md) for the full interface and per-solver notes.
+Or run a single solver by hand (see [`solvers/README.md`](solvers/README.md)):
+
+```bash
+cd solvers/vroom && docker compose up -d
+python3 run.py ../../datasets/public-benchmark/tsp/pb-0187.json.gz   # -> results/vroom/pb-0187.json
+```
 
 ## Reproducibility model
 

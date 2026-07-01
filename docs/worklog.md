@@ -5,6 +5,15 @@ research write-up (Slices 6–7). Newest first.
 
 ---
 
+## 2026-07-01 — Docs: end-to-end run guide
+
+Added [`RUNNING.md`](../RUNNING.md) — a copy-pasteable, prerequisites-to-results walkthrough (Docker +
+Python 3, no pip deps): clone → `run_benchmark.py` (all solvers) → `analysis/analyze.py` → read
+`results/`. The batch runner and the analysis step were previously undocumented in the README; the
+README now links the guide and shows the two-command quickstart. Verified the guide's commands run.
+
+---
+
 ## 2026-07-01 — Slice 5: comparison analyzer (no composite score)
 
 **Goal (per Rodrigo).** Not a single score — a **comparison** across solvers of travel time + the
