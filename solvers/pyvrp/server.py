@@ -39,7 +39,8 @@ def to_solution(instance: dict, summary: dict) -> dict:
         "routes": routes,
         "unserved": summary.get("dropped", []),
         "runtime_ms": summary.get("solve_ms"),
-        "meta": {k: summary.get(k) for k in ("duration", "service", "cost", "routes", "assigned", "unassigned")},
+        "meta": {k: summary.get(k) for k in ("duration", "service", "cost", "routes",
+                                             "assigned", "unassigned", "repaired_drops")},
     }
 
 

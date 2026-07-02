@@ -35,7 +35,13 @@ The engine's exact penalty *weights* live in an external crate, so absolute cost
 is not comparable across solvers. Compare quality metrics instead: unassigned
 (weighted by priority), travel time, vehicles used.
 
-Exit codes: 0 = solved, 1 = error, 2 = no feasible solution within the time limit.
+If PyVRP's best solution is infeasible (its prize can outweigh the capped
+feasibility penalty on instances that REQUIRE dropping clients — e.g. total demand
+> fleet capacity, or shifts too short to cover every visit), we don't discard it;
+we drop the minimal violating clients per route to recover a feasible solution
+(meta.repaired). Only a truly empty result (best is None) stays code 2.
+
+Exit codes: 0 = solved (possibly repaired), 1 = error, 2 = no solution produced.
 """
 import argparse
 import glob
@@ -296,14 +302,31 @@ def build_and_solve(instance, time_limit_ms, log=lambda *_: None):
     solve_ms = (time.time() - t0) * 1000.0
     best = res.best
 
-    if best is None or not best.is_feasible():
-        return {"code": 2, "error": "no feasible solution within time limit",
+    if best is None:
+        return {"code": 2, "error": "no solution produced within time limit",
                 "solve_ms": round(solve_ms, 1)}, meta
 
-    summary = _extract(best, num_depots, visits, vehicles, speeds, matrix)
+    routes = _routes_from_best(best, num_depots, K)
+    repaired = 0
+    if not best.is_feasible():
+        # PyVRP's best violates a hard constraint (capacity / time window / shift).
+        # On instances where feasibility REQUIRES dropping clients — e.g. total demand
+        # exceeds total fleet capacity, or shift windows can't cover every visit — the
+        # per-visit prize can exceed PyVRP's auto-escalating feasibility-penalty cap, so
+        # PyVRP keeps an over-serving *infeasible* solution rather than dropping. Instead
+        # of discarding the whole thing (which would report every visit as unserved), we
+        # salvage a feasible solution by dropping the minimal set of violating clients
+        # per route. Reported via meta.repaired / summary.repaired_drops.
+        before = sum(len(r) for r in routes)
+        routes = _repair_routes(routes, visits, vehicles, speeds, matrix, dims, allow_overload)
+        repaired = before - sum(len(r) for r in routes)
+
+    summary = _metrics_from_routes(routes, visits, vehicles, speeds, matrix)
     summary["code"] = 0
-    summary["cost"] = res.cost()
+    summary["cost"] = res.cost() if best.is_feasible() else None
     summary["solve_ms"] = round(solve_ms, 1)
+    summary["repaired_drops"] = repaired
+    meta["repaired"] = repaired > 0
     return summary, meta
 
 
@@ -330,17 +353,88 @@ def _unmodeled_features(visits, vehicles, multi_tw):
     return out
 
 
-def _extract(best, num_depots, visits, vehicles, speeds, matrix):
-    """Pull per-vehicle ordered visit indices out of the PyVRP solution and derive
-    quality metrics by simulating each route's timeline (PyVRP routes only carry
-    served clients; unserved ones never appear)."""
-    V = len(visits)
-    # vehicle_routes[k] = ordered visit indices for vehicle k (empty if unused).
-    routes = [[] for _ in range(len(vehicles))]
+def _routes_from_best(best, num_depots, K):
+    """Per-vehicle ordered visit indices from a PyVRP solution (feasible or not).
+    routes[k] = visit indices for vehicle k, empty if unused. PyVRP routes only
+    carry served clients; unserved ones never appear."""
+    routes = [[] for _ in range(K)]
     for r in best.routes():
         k = r.vehicle_type()  # one type per vehicle => vehicle index
         routes[k] = [idx - num_depots for idx in r.visits()]
+    return routes
 
+
+def _route_violation(perm, v, speed, visits, matrix, dims, allow_overload):
+    """First hard-constraint violation on a route, or None if it is feasible.
+    Returns ('capacity', dim) | ('tw', position) | ('overtime', None)."""
+    if dims and not allow_overload and v.get("capacity") is not None:
+        for d in dims:
+            capd = _dim_value(v.get("capacity"), d)
+            # Load profile: deliveries loaded at the depot (peak at departure), pickups
+            # collected en route. Peak load over the route must stay within capacity.
+            cur = peak = sum(max(0.0, _dim_value(visits[i].get("demand"), d)) for i in perm)
+            for i in perm:
+                dem = _dim_value(visits[i].get("demand"), d)
+                cur += max(0.0, -dem) - max(0.0, dem)  # pickup adds, delivery unloads
+                peak = max(peak, cur)
+            if peak > capd + 1e-6:
+                return ("capacity", d)
+    t = v.get("shift_start_time") or 0
+    prev = v.get("start_location")
+    for pos, i in enumerate(perm):
+        vt = visits[i]
+        loc = vt["location"]
+        if prev is not None:
+            t += int(matrix[prev][loc] / speed)
+        lo, hi = _visit_window(vt, None)
+        if lo is not None and t < lo:
+            t = lo  # wait until the window opens
+        if hi is not None and t > hi:
+            return ("tw", pos)  # this client is reached after its window closes
+        t += int(vt.get("duration", 0) or 0)
+        prev = loc
+    end = v.get("end_location")
+    if prev is not None and end is not None:
+        t += int(matrix[prev][end] / speed)
+    se = v.get("shift_end_time")
+    if se is not None and t > se:
+        return ("overtime", None)
+    return None
+
+
+def _repair_routes(routes, visits, vehicles, speeds, matrix, dims, allow_overload):
+    """Drop the minimal violating clients per route until every route satisfies its
+    hard capacity / time-window / shift constraints. Routes are independent, so each
+    is repaired on its own. Deterministic: capacity -> drop the largest-demand client;
+    time-window -> drop the late client; overtime -> drop the last client."""
+    out = []
+    for k, perm in enumerate(routes):
+        perm = list(perm)
+        v = vehicles[k]
+        speed = speeds[k]
+        while perm:
+            r = _route_violation(perm, v, speed, visits, matrix, dims, allow_overload)
+            if r is None:
+                break
+            kind, info = r
+            if kind == "capacity":
+                d = info
+                j = max(range(len(perm)),
+                        key=lambda p: abs(_dim_value(visits[perm[p]].get("demand"), d)))
+                perm.pop(j)
+            elif kind == "tw":
+                perm.pop(info)
+            else:  # overtime
+                perm.pop()
+        out.append(perm)
+    return out
+
+
+def _metrics_from_routes(routes, visits, vehicles, speeds, matrix):
+    """Derive quality metrics by simulating each route's timeline. `routes` is the
+    per-vehicle list of ordered visit indices (post-repair if the raw best was
+    infeasible); unserved visits are those in no route."""
+    V = len(visits)
     total_travel = total_service = total_lateness = total_overtime = 0
     routes_used = assigned = 0
 
@@ -402,6 +496,8 @@ def summary_line(name, summary, meta):
         return f"{name}: code={summary['code']} {summary.get('error','')}"
     s = summary
     warn = f" unmodeled={list(meta['unmodeled'])}" if meta["unmodeled"] else ""
+    if s.get("repaired_drops"):
+        warn += f" repaired_drops={s['repaired_drops']}"
     return (f"{name}: routes={s['routes']} assigned={s['assigned']}/{meta['num_visits']} "
             f"unassigned={s['unassigned']} duration={s['duration']} service={s['service']} "
             f"lateness={s['lateness']} overtime={s['overtime']} cost={s['cost']} "
