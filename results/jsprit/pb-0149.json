@@ -1,0 +1,1 @@
+{"instance":"pb-0149","solver":"jsprit","routes":[{"vehicle":2,"start_time":16200,"visits":[5,10,2,12,13,19,18,22,28,30,27,33]},{"vehicle":0,"start_time":16200,"visits":[0,11,8,24,17,25,31,36]},{"vehicle":1,"start_time":16200,"visits":[1,4,3,9,6,7,16,15,20,14,23,21,29,26,35]}],"unserved":[32,34],"runtime_ms":18.5,"meta":{}}

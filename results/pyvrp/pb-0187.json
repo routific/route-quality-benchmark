@@ -1,0 +1,1 @@
+{"instance":"pb-0187","solver":"pyvrp","routes":[{"vehicle":0,"start_time":32400,"visits":[6,12,23,21,29,26,13,7,9,22,3,18,4,15,0,24,10,2,19,27,17,25,8,28]}],"unserved":[1,5,11,14,16,20],"runtime_ms":2001.0,"meta":{"duration":20678,"service":7200,"cost":163838,"routes":1,"assigned":24,"unassigned":6}}

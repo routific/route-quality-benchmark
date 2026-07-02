@@ -1,0 +1,1 @@
+{"instance":"pb-0186","solver":"ortools","routes":[{"vehicle":36,"start_time":1731501000,"visits":[32,26,25,14,5,2,17,4,10,9,13,12,15,8,11,20,19,22,36,35,34,33,31,30,29,27,24,23,28,21,18,16,6,7,3,1,0]}],"unserved":[],"runtime_ms":2000.2,"meta":{"duration":8484,"service":15540,"cost":100008484,"routes":1,"assigned":37,"unassigned":0}}
