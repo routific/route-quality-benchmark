@@ -70,14 +70,24 @@ def main() -> int:
     ap.add_argument("--instances", help="comma-separated instance names (default: 5-instance sample)")
     ap.add_argument("--sample", type=int, help="use the first N dataset instances instead of the default")
     ap.add_argument("--time-limit-ms", type=int, help="flat solve budget for pyvrp/ortools/jsprit")
-    ap.add_argument("--budget-map", help="TSV (pb_name/budget_ms) per-problem budget; overrides --time-limit-ms")
+    ap.add_argument("--budget-from-routific", action="store_true",
+                    help="per-problem budget = max(2000, 2 x Routific's runtime) read from the published "
+                         "results/routific/ files — how the official comparison is run (fully reproducible)")
+    ap.add_argument("--budget-map", help="TSV (pb_name/budget_ms) explicit per-problem budget")
     ap.add_argument("--max-stops", type=int, help="skip instances with more than this many visits (all solvers)")
     ap.add_argument("--keep-up", action="store_true", help="leave services running afterwards")
     args = ap.parse_args()
 
-    budget_map = {}
-    if args.budget_map:
-        budget_map = {r["pb_name"]: int(r["budget_ms"]) for r in csv.DictReader(open(args.budget_map), delimiter="\t")}
+    # Per-problem competitor budget. The official run uses --budget-from-routific: each competitor
+    # gets max(2s, 2 x Routific's own runtime on that problem), read from the PUBLISHED
+    # results/routific/<name>.json — so the budgets are fully reproducible from public data.
+    budgets = {}
+    if args.budget_from_routific:
+        for f in glob.glob(os.path.join(REPO, "results", "routific", "*.json")):
+            rt = json.load(open(f)).get("runtime_ms") or 0
+            budgets[os.path.basename(f)[:-5]] = max(2000, 2 * int(rt))
+    elif args.budget_map:
+        budgets = {r["pb_name"]: int(r["budget_ms"]) for r in csv.DictReader(open(args.budget_map), delimiter="\t")}
 
     solvers = [s for s in args.solvers.split(",") if s in SOLVERS]
     if args.instances:
@@ -110,7 +120,7 @@ def main() -> int:
             continue
         for name, path in instances:
             cmd = [sys.executable, os.path.join(REPO, "solvers", solver, "run.py"), path]
-            budget = budget_map.get(name, args.time_limit_ms) if budget_map else args.time_limit_ms
+            budget = budgets.get(name, args.time_limit_ms)
             if budget and solver != "vroom":
                 cmd += ["--time-limit-ms", str(budget)]
             r = subprocess.run(cmd, capture_output=True, text=True)

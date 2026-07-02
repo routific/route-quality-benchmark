@@ -47,17 +47,22 @@ def psql_rows(dburl: str, sql: str) -> list[list[str]]:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--benchmark-id", type=int, required=True)
-    ap.add_argument("--solver", required=True, help="output solver name, e.g. routific-v3-ls")
-    ap.add_argument("--names", help="comma-separated pb names (default: all in provenance)")
+    ap.add_argument("--solver", required=True, help="output solver name, e.g. routific-v2 / routific-v3")
+    ap.add_argument("--names", help="comma-separated pb names (default: all mapped)")
+    ap.add_argument("--id-map", help="TSV (pb_name/.../new_id) mapping pb-name -> problem id for the "
+                                     "adjusted public-benchmark-standard runs; overrides the provenance source-id map")
     args = ap.parse_args()
 
     dburl = os.environ.get("BENCHMARK_DATABASE_URL")
     if not dburl:
         sys.exit("set BENCHMARK_DATABASE_URL")
 
-    prov = {r["name"]: r["source_instance_id"] for r in csv.DictReader(open(PROVENANCE))}
-    names = args.names.split(",") if args.names else list(prov)
-    src_by_name = {n: prov[n] for n in names if n in prov}
+    if args.id_map:  # adjusted `public-benchmark-standard` runs use new problem ids
+        mapping = {r["pb_name"]: r["new_id"] for r in csv.DictReader(open(args.id_map), delimiter="\t")}
+    else:            # legacy: map to the original public-benchmark problem id
+        mapping = {r["name"]: r["source_instance_id"] for r in csv.DictReader(open(PROVENANCE))}
+    names = args.names.split(",") if args.names else list(mapping)
+    src_by_name = {n: mapping[n] for n in names if n in mapping}
     ids = ",".join(src_by_name.values())
 
     rows = psql_rows(dburl, f"select problem_id, runtime, solution::text from results "
