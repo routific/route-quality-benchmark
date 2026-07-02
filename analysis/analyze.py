@@ -82,18 +82,22 @@ def main() -> int:
                 multiroute.add(name)
 
     w = 15
+    win_labels = [(f"Fewest {label}" if "Crossings" in label else f"Lowest {label}") for _, label, _ in METRICS]
+    label_w = max([len(label) for _, label, _ in METRICS] + [len(l) for l in win_labels] +
+                  [len("Metric"), len("Best on...")]) + 2
+
     print(f"solvers: {solvers}")
     print(f"instances ({len(instances)}): {instances}")
     print(f"multi-route instances ({len(multiroute)}): {sorted(multiroute)}\n")
 
     # --- per-metric means (lower is better) ---
     print("=== Per-metric mean (lower is better) ===")
-    print("Metric".ljust(34) + "".join(s.ljust(w) for s in solvers))
+    print("Metric".ljust(label_w) + "".join(s.ljust(w) for s in solvers))
     comp_rows = []
     for key, label, needs_mr in METRICS:
         insts = [n for n in instances if (not needs_mr or n in multiroute)]
         row = {"metric": label, "n": len(insts)}
-        line = label.ljust(34)
+        line = label.ljust(label_w)
         for s in solvers:
             vals = [data[(s, n)][key] for n in insts if data[(s, n)][key] is not None]
             mv = statistics.mean(vals) if vals else float("nan")
@@ -109,9 +113,9 @@ def main() -> int:
 
     # --- win rate (% of applicable instances where the solver is best; ties count for each) ---
     print("\n=== Win rate (% of applicable instances where solver is best) ===")
-    print("Best on...".ljust(34) + "".join(s.ljust(w) for s in solvers))
+    print("Best on...".ljust(label_w) + "".join(s.ljust(w) for s in solvers))
     win_rows = []
-    for key, label, needs_mr in METRICS:
+    for (key, label, needs_mr), win_label in zip(METRICS, win_labels):
         insts = [n for n in instances if (not needs_mr or n in multiroute)]
         wins = {s: 0 for s in solvers}
         for n in insts:
@@ -123,7 +127,7 @@ def main() -> int:
                 if v == best:
                     wins[s] += 1
         row = {"metric": label, "n": len(insts)}
-        line = f"Fewest {label}".ljust(34) if "Crossings" in label else f"Lowest {label}".ljust(34)
+        line = win_label.ljust(label_w)
         for s in solvers:
             pct = (100 * wins[s] / len(insts)) if insts else 0
             row[s] = round(pct)
