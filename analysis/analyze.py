@@ -44,14 +44,18 @@ def load_instance(name: str) -> dict:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--include-provisional", action="store_true",
-                    help="include routific-* result sets (flagged provisional / not comparable)")
+    ap.add_argument("--exclude", default="", help="comma-separated solver dirs to skip, e.g. jsprit")
+    ap.add_argument("--only-min-vehicles", action="store_true",
+                    help="restrict to instances with minimize_vehicles=True")
     args = ap.parse_args()
+    exclude = {s for s in args.exclude.split(",") if s}
 
+    # include the combined "routific" best-of + competitors; skip the routific-ls / routific-ga components
     solvers = sorted(d for d in os.listdir(RESULTS)
                      if os.path.isdir(os.path.join(RESULTS, d))
                      and not d.startswith("_")
-                     and (args.include_provisional or not d.startswith("routific")))
+                     and not d.startswith("routific-")
+                     and d not in exclude)
     if not solvers:
         sys.exit("no solver result dirs under results/")
 
@@ -61,6 +65,11 @@ def main() -> int:
         sys.exit("no instances common to all selected solvers")
 
     inst_cache: dict[str, dict] = {}
+    if args.only_min_vehicles:
+        instances = [n for n in instances if inst_cache.setdefault(n, load_instance(n)).get("minimize_vehicles")]
+        if not instances:
+            sys.exit("no minimize_vehicles=True instances in the common set")
+
     data: dict[tuple[str, str], dict] = {}
     multiroute: set[str] = set()
     for s in solvers:

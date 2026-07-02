@@ -1,0 +1,1 @@
+{"instance":"pb-0051","solver":"routific","routes":[{"vehicle":0,"start_time":34200,"visits":[8,15,27,18,28,34]},{"vehicle":2,"start_time":36000,"visits":[24,26,2,10,23,5,11,33,13,21,0]},{"vehicle":3,"start_time":36000,"visits":[22,1,32,16,14,29,31,4,36,7,20,17,35,3,25,9,6,12,19,30]}],"unserved":[],"runtime_ms":249,"meta":{"benchmark_id":2097,"best_of":"ga"}}

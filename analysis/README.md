@@ -5,8 +5,7 @@ total time. Every metric is **recomputed from the `(instance, solution)` pair al
 internals), so results are independently reproducible.
 
 ```bash
-python3 analysis/analyze.py                      # the open-source competitors
-python3 analysis/analyze.py --include-provisional # also show routific-* (provisional; see worklog)
+python3 analysis/analyze.py     # competitors + the combined "routific" best-of column (if present)
 ```
 
 Outputs (printed + `results/_analysis/*.csv`): a **per-metric mean** table and a **win-rate** table.
@@ -72,5 +71,6 @@ the methodology write-up (Slice 6).
   Runtime returns once there is (a) a single clock — server-side *pure solve* time — and (b) a
   per-problem budget derived from a valid Routific run (the internal benchmark budgets each competitor
   from ≈2× EngineV3's per-problem runtime, not a flat value).
-- **Routific results are provisional** (`--include-provisional`) until v3 is re-run on the priority-free
-  Standard Instances — see the worklog.
+- **Routific** appears as a single column: its published **raw result files** (`results/routific/`) — one
+  Standard Solution per instance. Anyone can recompute Routific's metrics from those solutions, exactly
+  like the competitors. Routific's engine is not runnable from this repo (contact Routific).

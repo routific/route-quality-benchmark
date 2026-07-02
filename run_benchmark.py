@@ -12,7 +12,10 @@ tears the service down. jsprit auto-skips instances >400 stops.
 """
 from __future__ import annotations
 import argparse
+import csv
 import glob
+import gzip
+import json
 import os
 import subprocess
 import sys
@@ -66,9 +69,15 @@ def main() -> int:
     ap.add_argument("--solvers", default="vroom,pyvrp,ortools,jsprit")
     ap.add_argument("--instances", help="comma-separated instance names (default: 5-instance sample)")
     ap.add_argument("--sample", type=int, help="use the first N dataset instances instead of the default")
-    ap.add_argument("--time-limit-ms", type=int, help="solve budget for pyvrp/ortools/jsprit")
+    ap.add_argument("--time-limit-ms", type=int, help="flat solve budget for pyvrp/ortools/jsprit")
+    ap.add_argument("--budget-map", help="TSV (pb_name/budget_ms) per-problem budget; overrides --time-limit-ms")
+    ap.add_argument("--max-stops", type=int, help="skip instances with more than this many visits (all solvers)")
     ap.add_argument("--keep-up", action="store_true", help="leave services running afterwards")
     args = ap.parse_args()
+
+    budget_map = {}
+    if args.budget_map:
+        budget_map = {r["pb_name"]: int(r["budget_ms"]) for r in csv.DictReader(open(args.budget_map), delimiter="\t")}
 
     solvers = [s for s in args.solvers.split(",") if s in SOLVERS]
     if args.instances:
@@ -80,7 +89,16 @@ def main() -> int:
         names = DEFAULT_INSTANCES
     instances = [(n, find_instance(n)) for n in names]
 
-    print(f"solvers: {solvers}\ninstances ({len(instances)}): {names}")
+    if args.max_stops:
+        keep = []
+        for n, p in instances:
+            with gzip.open(p, "rb") as f:
+                if len(json.load(f)["visits"]) <= args.max_stops:
+                    keep.append((n, p))
+        print(f"size cap {args.max_stops}: kept {len(keep)}/{len(instances)} instances")
+        instances = keep
+
+    print(f"solvers: {solvers}\ninstances ({len(instances)}): {[n for n, _ in instances]}")
     for solver in solvers:
         cfg = SOLVERS[solver]
         print(f"\n=== {solver}: bringing service up ===")
@@ -92,8 +110,9 @@ def main() -> int:
             continue
         for name, path in instances:
             cmd = [sys.executable, os.path.join(REPO, "solvers", solver, "run.py"), path]
-            if args.time_limit_ms and solver != "vroom":
-                cmd += ["--time-limit-ms", str(args.time_limit_ms)]
+            budget = budget_map.get(name, args.time_limit_ms) if budget_map else args.time_limit_ms
+            if budget and solver != "vroom":
+                cmd += ["--time-limit-ms", str(budget)]
             r = subprocess.run(cmd, capture_output=True, text=True)
             out = (r.stdout or r.stderr).strip().splitlines()
             print(f"  {out[-1] if out else '(no output)'}")
