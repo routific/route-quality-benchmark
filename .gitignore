@@ -21,4 +21,6 @@ solvers/vroom/conf/*.json
 results/routific-ls/
 results/routific-ga/
 results/routific-v2/
+results/routific-fmv-ls/
+results/routific-fmv-ga/
 results/_analysis/

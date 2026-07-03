@@ -47,10 +47,13 @@ straight from those files. VROOM has no budget (fixed effort). See the Solve-bud
 
 ## Caveats
 
-- **The Routific column is provisional.** Routific's engine is not runnable from this repo, so its
-  results are precomputed and bundled. The exact engine configuration used for the published run is
-  still being finalized; treat the Routific numbers as indicative until this note is updated. To
-  reproduce them in an isolated environment, [contact Routific](https://routific.com).
+- **The Routific column** is the engine run in its **fleet-minimizing configuration** (it minimizes
+  the number of vehicles), best-of its two solvers per instance. It's precomputed and bundled because
+  the engine isn't runnable from this repo, and covers 184/200 instances. To reproduce it in an
+  isolated environment, [contact Routific](https://routific.com).
+- **VROOM leads on coverage.** It serves ~191 more stops in total than Routific, concentrated in ~5
+  large `cvrp` instances (e.g. `pb-0069`, where Routific leaves 103 serveable stops unserved and VROOM
+  serves all). Identical on ~160/182 instances otherwise. See [`docs/results.md`](results.md).
 - **Runtime is not compared** — the solvers ran under different clocks and stopping rules. See
   [`analysis/README.md`](../analysis/README.md#caveats).
 - **Some instances have unavoidable unserved stops** (tight windows / capacity). "Unserved" is a
