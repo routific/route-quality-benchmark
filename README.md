@@ -5,9 +5,10 @@ anonymized delivery problems — measuring not just total travel time, but the q
 route *good to drive*: compactness, non-overlapping/non-crossing routes, balanced workloads, and
 fleet utilization.
 
-> **Status: work in progress.** This repo is being built slice by slice. Today it contains the
-> standard data contract (below). Datasets, solver harnesses, the runner, and the analyzer land in
-> subsequent slices — see [`docs/worklog.md`](docs/worklog.md).
+> **Status.** Complete end to end: the standard data contract, the published `public-benchmark`
+> dataset, the Dockerized solver harnesses, the batch runner, and the analyzer. See
+> [`docs/methodology.md`](docs/methodology.md) for how the datasets and metrics were built, and
+> [`docs/results-status.md`](docs/results-status.md) for what's published and the known gaps.
 
 ## What's here
 
@@ -19,9 +20,10 @@ fleet utilization.
 | [`solvers/`](solvers/) | Dockerized open-source solver harnesses (VROOM, PyVRP, OR-Tools, jsprit). |
 | `run_benchmark.py` | One-command batch runner (all solvers over a set of instances). |
 | [`analysis/`](analysis/) | The comparison analyzer + metric definitions. |
-| `results/` | Where solver runs + analysis land (git-ignored). |
+| [`results/`](results/) | Published solver results (the four competitors + Routific's); re-runs and analysis output land here too. |
 | [`RUNNING.md`](RUNNING.md) | **Step-by-step guide** to run the solvers + analysis end to end. |
-| `tools/` | Internal tooling used to build the published artifacts. |
+| [`docs/methodology.md`](docs/methodology.md) | How the dataset was built (anonymization, selection) and why the metrics were chosen. |
+| `tools/vrp_classify.py` | Classifies a Standard Instance by VRP type (TSP/CVRP/VRPTW/…). |
 
 ## Quickstart
 

@@ -60,10 +60,9 @@ has_time_windows, has_pdp, minimize_vehicles`. Contains **no** customer/job link
 - **Identifiers anonymized.** Vehicle/visit ids are sequential labels (`veh-N`, `visit-N`); instance
   names are opaque (`pb-XXXX`). No `user_id` / `job_id` / `original_problem_id` is published.
 
-> ⚠️ **Pre-publication gate — verify coordinate masking.** These files were generated from cached
-> instances that carry `original_problem_id` (i.e. the masking pipeline created them), but the actual
-> coordinate displacement was **not** independently re-verified during this build. Confirm coords are
-> genuinely displaced from the originals before any public release.
+> ✅ **Coordinate masking verified.** The published coordinates were manually confirmed to be
+> genuinely displaced from their true source locations (donut geomask applied), so no stop can be
+> traced back to a real address.
 
 ## Matrices
 

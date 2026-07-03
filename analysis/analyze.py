@@ -45,16 +45,20 @@ def load_instance(name: str) -> dict:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--exclude", default="", help="comma-separated solver dirs to skip, e.g. jsprit")
+    ap.add_argument("--include", default="", help="comma-separated component dirs to force-include "
+                                                  "(e.g. routific-v2,routific-ga), normally skipped")
     ap.add_argument("--only-min-vehicles", action="store_true",
                     help="restrict to instances with minimize_vehicles=True")
     args = ap.parse_args()
     exclude = {s for s in args.exclude.split(",") if s}
+    include = {s for s in args.include.split(",") if s}
 
-    # include the combined "routific" best-of + competitors; skip the routific-ls / routific-ga components
+    # combined "routific" best-of + competitors; the routific-ls / routific-ga / routific-v2
+    # components are skipped unless force-included via --include.
     solvers = sorted(d for d in os.listdir(RESULTS)
                      if os.path.isdir(os.path.join(RESULTS, d))
                      and not d.startswith("_")
-                     and not d.startswith("routific-")
+                     and (not d.startswith("routific-") or d in include)
                      and d not in exclude)
     if not solvers:
         sys.exit("no solver result dirs under results/")
