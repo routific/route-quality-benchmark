@@ -54,6 +54,8 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--exclude", default="", help="comma-separated solver dirs to skip, e.g. jsprit")
     ap.add_argument("--reference", default="routific", help="solver to compare travel time against")
+    ap.add_argument("--only-min-vehicles", action="store_true",
+                    help="restrict to instances with minimize_vehicles=True")
     args = ap.parse_args()
     exclude = {s for s in args.exclude.split(",") if s}
 
@@ -70,11 +72,15 @@ def main() -> int:
     if not common:
         sys.exit("no instances common to all selected solvers")
 
-    M = {}
+    M, inst_cache = {}, {}
     for n in common:
-        inst = load_instance(n)
+        inst = inst_cache[n] = load_instance(n)
         for s in solvers:
             M[(s, n)] = compute(inst, json.load(open(os.path.join(RESULTS, s, f"{n}.json"))))
+    if args.only_min_vehicles:
+        common = [n for n in common if inst_cache[n].get("minimize_vehicles")]
+        if not common:
+            sys.exit("no minimize_vehicles=True instances in the common set")
 
     def mean(xs): return statistics.mean(xs) if xs else float("nan")
 
