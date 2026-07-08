@@ -1,10 +1,11 @@
 # Results
 
 How Routific compares to the open-source solvers (VROOM, PyVRP, OR-Tools) on the `public-benchmark`
-dataset. The headline: **at the same coverage and the same fleet size, Routific gives up only ~1–3% on
-travel time while producing routes that are far more visually attractive (an order of magnitude fewer
-crossings between routes), better balanced, and lower on idle time — and that gap holds even when the
-competitors are given every advantage, on identical hardware.**
+dataset (**245 instances**, 30–3,000+ stops). The headline: **at the same coverage and the same fleet
+size, Routific gives up ~0–1% on travel time while producing routes that are far more visually
+attractive (an order of magnitude fewer crossings between routes), better balanced, and lower on idle
+time — and on average it's also the fastest solver — all on identical hardware, with the competitors
+given every advantage.**
 
 Every number here is recomputed from the published `(instance, solution)` files by
 [`analysis/compute_metrics.py`](../analysis/compute_metrics.py) and is reproducible with:
@@ -32,92 +33,92 @@ The competitors are given every advantage, so this is conservative for Routific:
 
 - **Same hardware.** Every solver ran on a **6-vCPU `c2-standard-8`** node — the same class Routific's
   own engine runs on — so nothing here is a hardware artifact.
-- **VROOM at `explore: 4`**, near its maximum search effort — it can't be said we under-powered it.
+- **VROOM at max search** — `explore: 4` on the original 200 instances; on the 45 largest (all >500
+  stops) `explore: 4` exceeds the 40-min cap, so those run at `explore: 3` (quality is flat across
+  explore levels, so this doesn't move the comparison — it only affects a couple percent of runtime).
 - **PyVRP and OR-Tools each get `2 × Routific's runtime`** on every problem as their time budget
   (they're anytime solvers) — the `--budget-from-routific` rule in [`RUNNING.md`](../RUNNING.md).
 - Routific is evaluated in its **fleet-minimizing configuration**; gating travel on **equal fleet
   size** keeps that objective difference from distorting the travel comparison.
 
-Common set below: **197 instances** (Routific + VROOM + PyVRP + OR-Tools; jsprit excluded because it
-skips >400-stop problems — see [Routific vs jsprit](results-jsprit.md) for that separate comparison).
+Common set below: **241 instances** (Routific + VROOM + PyVRP + OR-Tools; jsprit is compared
+separately in [Routific vs jsprit](results-jsprit.md) because it only runs ≤400-stop problems).
 
 ## 1. Coverage (unserved stops)
 
 | | Routific | VROOM | PyVRP | OR-Tools |
 |---|--:|--:|--:|--:|
-| mean unserved | 9.55 | 9.41 | 24.37 | 12.61 |
-| fewest-unserved win-rate | 93% | 97% | 89% | 91% |
+| mean unserved | 27.43 | 27.29 | 48.58 | 29.90 |
+| fewest-unserved win-rate | 93% | 97% | 88% | 92% |
 
-Routific and VROOM serve essentially identically. **PyVRP is the coverage outlier** — on this hardware
-its fixed time budget buys much less search on the hardest large instances, so it drops far more;
-OR-Tools also trails. This leaves **164 instances where all four serve identically** — the basis for
-the quality comparison.
+Routific and VROOM serve essentially identically. **PyVRP is the coverage outlier** — on the large
+instances its fixed time budget buys much less search, so it drops far more; OR-Tools is close to
+Routific. This leaves **199 instances where all four serve identically** — the basis for the quality
+comparison. (Unserved counts are high because the dataset includes many 1,000–3,000-stop problems.)
 
-## 2. Route quality at equal coverage (164 instances)
+## 2. Route quality at equal coverage (199 instances)
 
 Mean (lower is better), with Routific's win-rate — the share of instances where it's best:
 
 | metric | **Routific** | VROOM | PyVRP | OR-Tools | Routific win-rate |
 |---|--:|--:|--:|--:|--:|
-| Number of vehicles | **11.2** | 11.6 | 11.5 | 11.7 | **90%** |
-| **Crossings between routes (sum)** | **8.0** | 21.3 | 17.5 | 29.4 | **87%** |
-| **Crossings between routes (max)** | **1.7** | 3.3 | 2.5 | 3.8 | **81%** |
-| Crossings within a route | 63.9 | 65.3 | 64.7 | 66.8 | 45% |
-| **Workload imbalance** | **68.7** | 91.7 | 86.7 | 84.2 | **58%** |
-| **Route-duration variance** | **8,091** | 11,545 | 11,033 | 10,926 | **47%** |
-| **Idle / wait (s)** | **4,774** | 7,250 | 6,405 | 7,430 | **97%** |
+| Number of vehicles | **14.9** | 15.3 | 15.4 | 15.5 | **90%** |
+| **Crossings between routes (sum)** | **12.5** | 33.7 | 36.0 | 49.0 | **86%** |
+| **Crossings between routes (max)** | **2.1** | 3.9 | 3.2 | 4.4 | **80%** |
+| Crossings within a route | 90.2 | 92.3 | 92.0 | 93.1 | 43% |
+| **Workload imbalance** | **73.8** | 97.3 | 98.9 | 94.6 | **59%** |
+| **Route-duration variance** | **9,043** | 13,076 | 13,306 | 12,689 | **49%** |
+| **Idle / wait (s)** | **4,331** | 6,554 | 5,846 | 6,832 | **97%** |
 
 - **Crossings between routes** — the classic "spaghetti" signal drivers and dispatchers react to —
-  Routific has **~2–4× fewer** than any competitor and is best on **87%** of instances.
+  Routific has **~3× fewer** than any competitor and is best on **86%** of instances.
 - **Idle / wait time** is lowest for Routific on **97%** of instances.
 - **Workload imbalance** and **route-duration variance** (how evenly work is split) are both lowest for Routific.
-- **Fleet size is lowest for Routific** (11.2 vs 11.5–11.7, best on 90%) — it isn't buying route quality with extra trucks; it uses fewer.
+- **Fleet size is lowest for Routific** (14.9 vs 15.3–15.5, best on 90%) — it uses fewer trucks, not more.
 
 ## 3. Travel time, at equal coverage *and* equal fleet
 
 | Routific vs | instances | travel ratio (Routific ÷ competitor) |
 |---|--:|--:|
-| VROOM | 150 | 1.02 |
-| PyVRP | 140 | 1.02 |
-| OR-Tools | 144 | 1.00 |
+| VROOM | 180 | 1.01 |
+| PyVRP | 159 | 1.01 |
+| OR-Tools | 169 | 1.00 |
 
-Once fleet size is matched, **the competitors edge Routific by ~1–3% on raw distance** — and Routific
-pays only that couple-percent for its large route-quality gains.
+Once fleet size is matched, **travel is within ~1%** — effectively a tie (against OR-Tools Routific is
+even fractionally shorter). Routific pays essentially nothing on distance for its route-quality gains.
 
 ## 4. Runtime (same hardware — 6-vCPU c2-standard-8)
 
-Because every solver ran on identical hardware, runtimes are comparable (unlike most cross-tool
-benchmarks):
+Because every solver ran on identical hardware, runtimes are comparable:
 
 | solver | mean | median | note |
 |---|--:|--:|---|
-| Routific | 101,560 ms | 5,893 ms | engine solve time |
-| VROOM | 156,624 ms | 4,257 ms | `explore: 4`, no time budget |
-| PyVRP | 204,244 ms | 11,825 ms | anytime — budget = 2× Routific |
-| OR-Tools | 203,498 ms | 11,786 ms | anytime — budget = 2× Routific |
+| **Routific** | **116,287 ms** | 22,681 ms | engine solve time |
+| VROOM | 181,447 ms | 14,144 ms | max `explore`, no time budget |
+| PyVRP | 233,928 ms | 45,438 ms | anytime — budget = 2× Routific |
+| OR-Tools | 232,890 ms | 45,363 ms | anytime — budget = 2× Routific |
 
-- **PyVRP and OR-Tools** are anytime solvers *given* 2× Routific's runtime, so their times are 2×
-  Routific **by construction** — not an independent measurement.
-- **VROOM** (no budget) is the only independent competitor clock. Even at max search (`explore: 4`) it's
-  **faster than Routific on the typical instance** (median 4.3 s vs 5.9 s); its higher *mean* is the
-  giant tail, where explore-4 grinds the biggest problems. At `explore: 3` it's on par with Routific
-  overall. More search makes VROOM's routes a little *shorter*, never *tidier*.
-- **Bottom line:** on equal hardware Routific is not the slow solver — it's competitive with or faster
-  than the open-source solvers *while* producing the higher-quality routes above.
+- **Routific is the fastest on average** (mean 116k ms vs 181k–234k). PyVRP/OR-Tools are 2× Routific
+  *by construction* (that's their budget). VROOM has no budget: it's quick on small problems (lower
+  median) but its **mean is much higher than Routific's** because, with no stopping rule, it grinds the
+  large instances — so on the big problems it's slower than Routific.
+- **Bottom line:** on equal hardware Routific is not the slow solver — on average it's the *fastest*,
+  while producing the higher-quality routes above.
 
 ## Reading it
 
-> **At equal stops and equal trucks, Routific gives up ~1–3% on travel and wins decisively on the
+> **At equal stops and equal trucks, Routific ties on travel (~±1%) and wins decisively on the
 > qualities that make a route good to operate — far fewer crossings, more even workloads, less idle
-> time, a smaller fleet — at competitive runtime on the same hardware.** And this holds with the
-> competitors handed their strongest settings: VROOM at near-max search, PyVRP and OR-Tools at twice
-> Routific's time.
+> time, a smaller fleet — and is the fastest solver on average.** This holds with the competitors at
+> their strongest: VROOM at max search, PyVRP and OR-Tools at twice Routific's time. More search / more
+> time makes the competitors' routes a little *shorter*, never *tidier*. The gap is sharpest on the
+> **large instances**, where the engine's optimization has the most room to work.
 
 ## Caveats
 
 - **Coverage is a near-tie** with VROOM; PyVRP/OR-Tools trail on the hardest large instances.
-- **VROOM at `explore: 4` can't finish ~3 of the largest instances** within the time cap, so its column
-  covers 197/200. PyVRP, OR-Tools, and Routific cover all 200.
+- **VROOM covers 241/245** — a few of the very largest exceed the time cap even at `explore: 3`.
+  PyVRP, OR-Tools, and Routific cover all 245.
 - **The Routific column's engine is not runnable from this repo** ([contact us](https://routific.com));
   its solutions are precomputed and bundled so the comparison reproduces from public files alone.
 

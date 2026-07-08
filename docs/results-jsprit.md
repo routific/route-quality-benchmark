@@ -62,7 +62,7 @@ Routific is ~9% *shorter*** on travel, and lower on **77 of 78** head-to-heads.
 
 ## Caveats
 
-- **jsprit covers 126/200** — only the ≤ 400-stop instances. The largest problems (up to 3,000+ stops)
+- **jsprit covers 126/245** — only the ≤ 400-stop instances. The largest problems (up to 3,000+ stops)
   are outside its scope entirely.
 - **Runtime is not compared for jsprit.** Its reported time is client-side wall-clock (it includes the
   HTTP round-trip and jsprit caps by iteration count, not a single server-side clock), so it isn't

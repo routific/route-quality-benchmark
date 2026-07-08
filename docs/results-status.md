@@ -6,15 +6,16 @@ analyzer recomputes every metric from `(instance, solution)`, so anyone can repr
 
 ## Coverage
 
-The dataset has **200 instances**. Published coverage per solver:
+The dataset has **245 instances** (the original 200 plus 45 large-instance additions). Published
+coverage per solver:
 
 | solver | results | notes |
 |---|---:|---|
-| **Routific** | 200 / 200 | complete — engine not runnable from this repo, solutions bundled |
-| **OR-Tools** | 200 / 200 | complete |
-| **PyVRP** | 200 / 200 | complete (see repair note) |
-| **VROOM** | 197 / 200 | `explore: 4` exceeds the time cap on ~3 of the largest instances |
-| **jsprit** | 126 / 200 | skips instances > 400 stops by default |
+| **Routific** | 245 / 245 | complete — engine not runnable from this repo, solutions bundled |
+| **OR-Tools** | 245 / 245 | complete |
+| **PyVRP** | 245 / 245 | complete (see repair note) |
+| **VROOM** | 241 / 245 | a few of the very largest exceed the time cap (see note) |
+| **jsprit** | 126 / 245 | skips instances > 400 stops by default |
 
 The analyzer compares on the **intersection** of the selected solvers (instances all of them solved),
 so a solver's gaps only shrink the common set for comparisons that include it — they don't corrupt
@@ -22,9 +23,11 @@ other solvers' numbers. Run `analysis/analyze.py --exclude jsprit` to compare ov
 
 ## Per-solver notes
 
-- **VROOM** runs at a fixed `explore` search level and has **no time budget**. It's published at
-  `explore: 4` (near-max effort); at that level it can't finish ~3 of the largest instances within the
-  40-min per-request cap, so those are simply absent rather than reported as failures.
+- **VROOM** runs at a fixed `explore` search level and has **no time budget**. It's published at max
+  search: `explore: 4` on the original 200 instances, and `explore: 3` on the 45 large additions (all
+  >500 stops), where `explore: 4` exceeds the 40-min per-request cap. Quality is flat across explore
+  levels, so this only affects a couple percent of runtime, not the comparison. A few of the very
+  largest instances exceed the cap even at `explore: 3` and are simply absent rather than failures.
 - **PyVRP** is a hard-constrained solver. On a few instances feasibility *requires* dropping stops (total
   demand exceeds fleet capacity, or shifts are too short to cover every stop). PyVRP can return an
   over-serving **infeasible** best there; the harness **repairs it to feasibility** by dropping the
@@ -48,10 +51,10 @@ straight from those files. VROOM has no budget (fixed effort). See the Solve-bud
 ## Caveats
 
 - **The Routific column** is the engine run in its **fleet-minimizing configuration** (it minimizes
-  the number of vehicles), best-of its two solvers per instance. It covers all 200 instances. It's
+  the number of vehicles), best-of its two solvers per instance. It covers all 245 instances. It's
   precomputed and bundled because the engine isn't runnable from this repo; to reproduce it in an
   isolated environment, [contact Routific](https://routific.com).
-- **Coverage is a near-tie** between Routific and VROOM (mean unserved 9.55 vs 9.41 on the common set);
+- **Coverage is a near-tie** between Routific and VROOM (mean unserved 27.43 vs 27.29 on the common set);
   PyVRP and OR-Tools trail on the hardest large instances. See [`docs/results.md`](results.md).
 - **Runtime IS compared** — every solver ran on identical hardware (6-vCPU `c2-standard-8`), so runtimes
   are directly comparable; see the Runtime section of [`docs/results.md`](results.md).

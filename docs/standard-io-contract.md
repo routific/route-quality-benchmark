@@ -88,7 +88,7 @@ normalization, documented here for transparency:
 | `etas_options.*` (soft slack) | Instances published as the **hard-constrained** version (soft lateness / overtime / capacity-overload removed). Matches the benchmark's own `remove_soft_constraints`, so every solver competes on the same hard problem. | 28 lateness, 36 overtime, 19 cap-overload, 7 squash |
 | `visits[].priority` | All stops treated as **equal priority**. | 9,595 visits had non-default priority |
 | `vehicles[].speed` | Fleet normalized to **uniform speed** (effective time = `distances[i][j]`). | 31 non-unit speed; 24 mixed-speed fleets |
-| `secondary_objective.*` except `minimize_vehicles` | Distance / balance / cluster-overlap objectives dropped; only fleet-size minimization retained. | all 200 |
+| `secondary_objective.*` except `minimize_vehicles` | Distance / balance / cluster-overlap objectives dropped; only fleet-size minimization retained. | all 245 |
 
 ### Fields intentionally excluded
 
@@ -97,7 +97,7 @@ Because the contract lists them here explicitly, the exporter's job is unambiguo
 
 | Internal field | Why removed |
 |---|---|
-| `locations[].name` | **PII** — real street address (present in 181/200 raw instances). Removed entirely. |
+| `locations[].name` | **PII** — real street address (present in nearly all raw instances). Removed entirely. |
 | `locations[].id` | Internal opaque token, redundant with the positional index. |
 | `user_id`, `job_id` | Customer/job linkage (DB-only; never emitted). |
 | `original_problem_id` | Links back to the pre-anonymization customer problem; kept private, never published. |
