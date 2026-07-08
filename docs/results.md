@@ -39,7 +39,7 @@ The competitors are given every advantage, so this is conservative for Routific:
   size** keeps that objective difference from distorting the travel comparison.
 
 Common set below: **197 instances** (Routific + VROOM + PyVRP + OR-Tools; jsprit excluded because it
-skips >400-stop problems).
+skips >400-stop problems — see [Routific vs jsprit](results-jsprit.md) for that separate comparison).
 
 ## 1. Coverage (unserved stops)
 
