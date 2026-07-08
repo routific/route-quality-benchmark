@@ -6,8 +6,7 @@ analyzer recomputes every metric from `(instance, solution)`, so anyone can repr
 
 ## Coverage
 
-The dataset has **245 instances** (the original 200 plus 45 large-instance additions). Published
-coverage per solver:
+The dataset has **245 instances**. Published coverage per solver:
 
 | solver | results | notes |
 |---|---:|---|
@@ -24,10 +23,10 @@ other solvers' numbers. Run `analysis/analyze.py --exclude jsprit` to compare ov
 ## Per-solver notes
 
 - **VROOM** runs at a fixed `explore` search level and has **no time budget**. It's published at max
-  search: `explore: 4` on the original 200 instances, and `explore: 3` on the 45 large additions (all
-  >500 stops), where `explore: 4` exceeds the 40-min per-request cap. Quality is flat across explore
-  levels, so this only affects a couple percent of runtime, not the comparison. A few of the very
-  largest instances exceed the cap even at `explore: 3` and are simply absent rather than failures.
+  search — `explore: 4`, dropping to `explore: 3` on the largest instances (>500 stops), where
+  `explore: 4` exceeds the 40-min per-request cap. Quality is flat across explore levels, so this only
+  affects a couple percent of runtime, not the comparison. A few of the very largest instances exceed
+  the cap even at `explore: 3` and are simply absent rather than reported as failures.
 - **PyVRP** is a hard-constrained solver. On a few instances feasibility *requires* dropping stops (total
   demand exceeds fleet capacity, or shifts are too short to cover every stop). PyVRP can return an
   over-serving **infeasible** best there; the harness **repairs it to feasibility** by dropping the

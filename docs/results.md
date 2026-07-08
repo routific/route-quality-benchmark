@@ -33,9 +33,9 @@ The competitors are given every advantage, so this is conservative for Routific:
 
 - **Same hardware.** Every solver ran on a **6-vCPU `c2-standard-8`** node — the same class Routific's
   own engine runs on — so nothing here is a hardware artifact.
-- **VROOM at max search** — `explore: 4` on the original 200 instances; on the 45 largest (all >500
-  stops) `explore: 4` exceeds the 40-min cap, so those run at `explore: 3` (quality is flat across
-  explore levels, so this doesn't move the comparison — it only affects a couple percent of runtime).
+- **VROOM at max search** — `explore: 4`, dropping to `explore: 3` on the largest instances (>500
+  stops), where `explore: 4` exceeds the 40-min cap. Quality is flat across explore levels, so this
+  doesn't move the comparison — it only affects a couple percent of runtime.
 - **PyVRP and OR-Tools each get `2 × Routific's runtime`** on every problem as their time budget
   (they're anytime solvers) — the `--budget-from-routific` rule in [`RUNNING.md`](../RUNNING.md).
 - Routific is evaluated in its **fleet-minimizing configuration**; gating travel on **equal fleet

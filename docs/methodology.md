@@ -16,9 +16,8 @@ This document is the narrative. The exact definitions live next to the code:
 
 ### 1.1 Source and selection
 
-The `public-benchmark` dataset is **245 real-world VRP instances** (the original 200 plus 45
-large-instance additions) derived from Routific customer delivery problems — not synthetic or
-randomly generated. Real instances matter: synthetic VRPs
+The `public-benchmark` dataset is **245 real-world VRP instances** derived from Routific customer
+delivery problems — not synthetic or randomly generated. Real instances matter: synthetic VRPs
 (uniform points on a square) don't have the geographic clustering, time-window structure, or
 capacity mixes that make real routing hard and that visual-attractiveness metrics are meant to
 capture.
@@ -27,8 +26,8 @@ Instances were selected by **stratified sampling** from the population of custom
 is representative rather than cherry-picked:
 
 - **Size strata.** The set spans small to very large problems — 29 instances under 50 stops, 73 in the
-  50–200 range, and 143 with 200+ (up to a 3,577-location problem). The 45 large additions deliberately
-  thicken the big end (all >500 stops), so the benchmark is honest about how solvers scale.
+  50–200 range, and 143 with 200+ (up to a 3,577-location problem). This keeps the benchmark honest
+  about how solvers scale, not just how they do on toy sizes.
 - **Constraint strata.** Problems are drawn across VRP families so no single constraint dominates:
   CVRP (120), VRPTW (59), plain multi-vehicle VRP (46), CVRPTW (17), and TSP (3). Types are assigned
   **from instance content** by [`tools/vrp_classify.py`](../tools/vrp_classify.py), not from any source
