@@ -50,7 +50,7 @@ for that metric — jsprit produces markedly more tangled routes. Routific is al
 |---|--:|--:|
 | jsprit | 78 | **0.91** |
 
-Unlike VROOM / PyVRP / OR-Tools — where Routific ties or gives up ~1–3% on travel — **against jsprit
+Unlike VROOM / PyVRP / OR-Tools — where Routific ties or gives up ~1% on travel — **against jsprit
 Routific is ~9% *shorter*** on travel, and lower on **77 of 78** head-to-heads.
 
 ## Reading it
