@@ -1,6 +1,6 @@
 # `public-benchmark` dataset
 
-**200 anonymized, real-world VRP instances** derived from Routific customer delivery problems, each
+**245 anonymized, real-world VRP instances** derived from Routific customer delivery problems, each
 carrying a pre-computed **raw-OSRM** travel-time matrix. This is the routific (customer-derived)
 dataset for the benchmark. Every instance conforms to the
 [Standard Instance contract](../../docs/standard-io-contract.md).
@@ -12,14 +12,14 @@ Instances are segregated by VRP type (classification derived purely from instanc
 
 | type | count | meaning |
 |---|---:|---|
-| `cvrp`   | 84 | capacity, no time windows |
-| `vrptw`  | 53 | time windows, no capacity |
+| `cvrp`   | 120 | capacity, no time windows |
+| `vrptw`  | 59 | time windows, no capacity |
 | `vrp`    | 46 | multi-vehicle, no capacity/TW |
-| `cvrptw` | 14 | capacity + time windows |
+| `cvrptw` | 17 | capacity + time windows |
 | `tsp`    | 3  | single vehicle, no capacity/TW |
-| **total** | **200** | |
+| **total** | **245** | |
 
-Size spread: **29** instances < 50 visits, **73** with 50–200, **98** with 200+.
+Size spread: **29** instances < 50 visits, **73** with 50–200, **143** with 200+.
 
 ```
 public-benchmark/
@@ -34,7 +34,7 @@ public-benchmark/
 ## Reading an instance
 
 Instances are stored **gzipped + minified** (`.json.gz`) — the matrices are large (up to a
-3,577×3,577 problem), so the full set is ~294 MB gzipped vs ~1.4 GB pretty-printed. The `.gz` is only
+3,577×3,577 problem), so the full set is ~471 MB gzipped vs ~2.3 GB pretty-printed. The `.gz` is only
 on-disk encoding; the content is exactly the [Standard Instance](../../docs/standard-io-contract.md).
 
 ```python
@@ -55,8 +55,8 @@ has_time_windows, has_pdp, minimize_vehicles`. Contains **no** customer/job link
 - **Coordinates** are **donut-geomasked** (displaced from their true location; density-adaptive
   radius, 50 m–3 km) — see the dataset methodology doc (Slice 6).
 - **Street addresses removed.** The Standard Instance format carries coordinates only; the address
-  field that existed in 181/200 source instances is dropped by construction (verified: 0 residual
-  address strings across all 200 files).
+  field that existed in the source instances is dropped by construction (verified: 0 residual
+  address strings across all 245 files).
 - **Identifiers anonymized.** Vehicle/visit ids are sequential labels (`veh-N`, `visit-N`); instance
   names are opaque (`pb-XXXX`). No `user_id` / `job_id` / `original_problem_id` is published.
 
