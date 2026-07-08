@@ -114,9 +114,10 @@ Routific's internal analyzer** so the public numbers line up with the internal o
 
 - **No composite score.** Collapsing quality into one number hides the trade-offs; we show the
   dimensions.
-- **Runtime is not compared (yet).** The solvers run under different clocks and stopping rules (a fixed
-  effort level vs. a wall-clock budget vs. an iteration cap), so a head-to-head speed number would be
-  misleading. See the caveat in [`analysis/README.md`](../analysis/README.md).
+- **Runtime is compared on equal hardware.** Every solver ran on the same 6-vCPU `c2-standard-8` node,
+  so runtimes are directly comparable — see the Runtime section of [`docs/results.md`](results.md).
+  (The anytime solvers get 2× Routific's runtime as budget, so their times are 2× Routific by
+  construction; VROOM, with no budget, is the only independent competitor clock.)
 - **No ETA/traffic modeling.** Raw OSRM only — quality is judged on the routing decisions, not the
   travel-time model.
 

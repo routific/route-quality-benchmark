@@ -65,12 +65,12 @@ the methodology write-up (Slice 6).
 
 ## Caveats
 
-- **Runtime is deferred, not shown.** The solvers ran under different clocks and stopping rules (VROOM a
-  fixed `explore` effort ≈ ms with no time budget; PyVRP/OR-Tools a flat wall-clock budget; jsprit an
-  iteration cap; jsprit's number even included the HTTP round-trip). That is not a fair speed comparison.
-  Runtime returns once there is (a) a single clock — server-side *pure solve* time — and (b) a
-  per-problem budget derived from a valid Routific run (the internal benchmark budgets each competitor
-  from ≈2× EngineV3's per-problem runtime, not a flat value).
+- **Runtime is shown, on equal hardware.** Every solver ran on the same 6-vCPU `c2-standard-8` node, so
+  runtimes are directly comparable (see the Runtime section of [`docs/results.md`](../docs/results.md)).
+  The anytime solvers (PyVRP/OR-Tools) are *given* 2× Routific's runtime as their budget, so their times
+  are 2× Routific by construction; VROOM (no budget, fixed `explore`) is the only independent competitor
+  clock. jsprit is excluded from the timed comparison (its number includes the HTTP round-trip; it caps
+  by iterations).
 - **Routific** appears as a single column: its published **raw result files** (`results/routific/`) — one
   Standard Solution per instance. Anyone can recompute Routific's metrics from those solutions, exactly
   like the competitors. Routific's engine is not runnable from this repo (contact Routific).

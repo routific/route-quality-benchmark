@@ -5,11 +5,11 @@
 cliArgs:
   geometry: false        # no route geometry (no OSRM backend)
   planmode: false
-  threads: 4
-  explore: 2             # search level 0..5. Kept at 2 (the value behind the published
-                         # results): VROOM has no per-problem time budget, so `explore` is
-                         # the only effort lever and it is server-wide — level 5 exploded on
-                         # the 3,000-stop tail. Most instances solve in ms regardless.
+  threads: 6             # matches the 6-vCPU c2-standard-8 hardware the published runs used
+  explore: 4             # search level 0..5. Published at 4 (near-max effort) so VROOM gets its
+                         # strongest search. Level 5 exploded on the 3,000-stop tail; at 4 a
+                         # few of the largest instances hit the 40-min server cap below and are
+                         # left unserved. explore has no time budget — it's VROOM's only lever.
   limit: '100mb'         # max request body (matrices can be large)
   logdir: '/..'
   logsize: '100M'
@@ -19,7 +19,7 @@ cliArgs:
   path: ''
   port: 3000
   router: 'osrm'
-  timeout: 900000        # ms (15 min) safety cap for the large-instance tail
+  timeout: 2400000       # ms (40 min) safety cap for the large-instance tail
   baseurl: '/'
 routingServers:
   osrm:

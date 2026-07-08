@@ -30,7 +30,8 @@ def main() -> int:
     ap.add_argument("instance")
     ap.add_argument("-o", "--out")
     ap.add_argument("--url", default=os.environ.get("VROOM_URL", "http://localhost:3030"))
-    ap.add_argument("--timeout", type=int, default=1000, help="HTTP timeout seconds")
+    ap.add_argument("--timeout", type=int, default=2460, help="HTTP timeout seconds "
+                    "(60s above VROOM's own 40-min server cap, so its timeout fires first)")
     args = ap.parse_args()
 
     inst = load_instance(args.instance)

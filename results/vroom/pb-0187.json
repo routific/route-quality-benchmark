@@ -1,1 +1,1 @@
-{"instance":"pb-0187","solver":"vroom","routes":[{"vehicle":0,"start_time":32400,"visits":[6,12,23,21,29,26,13,7,9,22,3,18,4,15,0,24,10,2,19,27,17,25,8,28]}],"unserved":[11,5,1,14,16,20],"runtime_ms":5,"meta":{"routes":1,"unassigned":6,"duration":20678,"cost":100020678}}
+{"instance":"pb-0187","solver":"vroom","routes":[{"vehicle":0,"start_time":32400,"visits":[6,12,23,21,29,26,13,7,9,22,3,18,4,15,0,24,10,2,19,27,17,25,8,28]}],"unserved":[11,5,1,14,16,20],"runtime_ms":21,"meta":{"routes":1,"unassigned":6,"duration":20678,"cost":100020678}}
