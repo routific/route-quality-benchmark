@@ -53,7 +53,7 @@ has_time_windows, has_pdp, minimize_vehicles`. Contains **no** customer/job link
 ## Anonymization
 
 - **Coordinates** are **donut-geomasked** (displaced from their true location; density-adaptive
-  radius, 50 m–3 km) — see the dataset methodology doc (Slice 6).
+  radius, 50 m–3 km) — see the [methodology doc](../../docs/methodology.md).
 - **Street addresses removed.** The Standard Instance format carries coordinates only; the address
   field that existed in the source instances is dropped by construction (verified: 0 residual
   address strings across all 245 files).
@@ -74,7 +74,7 @@ routing-algorithm quality from ETA methodology.
 
 Matrices were computed with **OSRM `v6.0.0`** (`project-osrm/osrm-backend`, Contraction Hierarchies,
 `--max-table-size 8000`) over **Geofabrik `<region>-latest.osm.pbf`** extracts. The dataset spans six
-regions; extract build dates (read from Routific's `kstaging` OSRM deployments):
+regions; extract build dates (read from the OSRM deployments that produced the matrices):
 
 | region | instances\* | OSM extract build date |
 |---|---:|---|

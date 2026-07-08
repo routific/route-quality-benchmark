@@ -3,8 +3,8 @@
 Each competitor solver is packaged so it runs on a fresh machine via Docker and speaks the
 [Standard I/O contract](../docs/standard-io-contract.md): it takes a **Standard Instance** and produces
 a **Standard Solution** (a per-route ordered permutation of visit indices). This lets every solver be
-compared head-to-head on the same problems, and lets the metrics (Slice 5) recompute from
-`(instance, solution)` alone.
+compared head-to-head on the same problems, and lets the [analyzer](../analysis/) recompute every
+metric from `(instance, solution)` alone.
 
 > Routific's own v3 engine is **not** runnable from this repo — [contact Routific](https://routific.com).
 > Its results are published so the comparison is complete.
@@ -26,8 +26,9 @@ solvers/<solver>/run.py  <instance.json[.gz]>  [-o out.json]
 ```
 
 **Output location.** By default the solution is written to **`results/<solver>/<instance>.json`** at the
-repo root (override with `-o`). e.g. the command above writes `results/vroom/pb-0187.json`. `results/`
-is git-ignored (local run artifacts); the *published* results ship separately (Slice 4).
+repo root (override with `-o`). e.g. the command above writes `results/vroom/pb-0187.json`. Under
+`results/`, only the published solver columns are tracked in git; everything else there (experiments,
+variants, generated tables) is git-ignored local run artifacts.
 
 **jsprit scale cap.** `solvers/jsprit/run.py` **skips instances with >400 stops by default** (jsprit
 doesn't scale past that in a comparable budget); pass `--force` (or `--max-stops N`) to override.
