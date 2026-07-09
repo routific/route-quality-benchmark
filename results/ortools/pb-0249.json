@@ -1,0 +1,1 @@
+{"instance":"pb-0249","solver":"ortools","routes":[{"vehicle":0,"start_time":28800,"visits":[29,30,26,28,31,32,1,3,33,34,36,35,4,6,2,5,0,7,8,10,9,14,17,22,18,16,21,23,19,15,12,24,25,13,20,11,27]}],"unserved":[],"runtime_ms":2000.1,"meta":{"duration":13368,"service":22200,"cost":13368,"routes":1,"assigned":37,"unassigned":0}}

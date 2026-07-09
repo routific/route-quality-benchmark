@@ -16,7 +16,7 @@ This document is the narrative. The exact definitions live next to the code:
 
 ### 1.1 Source and selection
 
-The `public-benchmark` dataset is **245 real-world VRP instances** derived from Routific customer
+The `public-benchmark` dataset is **264 real-world VRP instances** derived from Routific customer
 delivery problems — not synthetic or randomly generated. Real instances matter: synthetic VRPs
 (uniform points on a square) don't have the geographic clustering, time-window structure, or
 capacity mixes that make real routing hard and that visual-attractiveness metrics are meant to
@@ -25,13 +25,15 @@ capture.
 Instances were selected by **stratified sampling** from the population of customer problems so the set
 is representative rather than cherry-picked:
 
-- **Size strata.** The set spans small to very large problems — 29 instances under 50 stops, 73 in the
+- **Size strata.** The set spans small to very large problems — 37 instances under 50 stops, 84 in the
   50–200 range, and 143 with 200+ (up to a 3,577-location problem). This keeps the benchmark honest
   about how solvers scale, not just how they do on toy sizes.
 - **Constraint strata.** Problems are drawn across VRP families so no single constraint dominates:
-  CVRP (120), VRPTW (59), plain multi-vehicle VRP (46), CVRPTW (17), and TSP (3). Types are assigned
+  CVRP (120), VRPTW (63), plain multi-vehicle VRP (46), CVRPTW (23), and TSP (12). Types are assigned
   **from instance content** by [`tools/vrp_classify.py`](../tools/vrp_classify.py), not from any source
-  label, so the taxonomy is reproducible from the published files alone.
+  label, so the taxonomy is reproducible from the published files alone. A batch of **19
+  single-vehicle instances** (`pb-0246`–`pb-0264`, 31–120 stops) was added 2026-07-08 through the
+  same anonymization pipeline.
 - **Near-duplicate removal.** Highly similar problems were de-duplicated so the sample doesn't
   over-weight one customer's recurring route shape.
 
@@ -54,7 +56,7 @@ description is in the [dataset README](../datasets/public-benchmark/README.md#an
   to delivery stops.
 - **Addresses and identifiers removed.** The Standard Instance format carries **coordinates only** — no
   street address, and ids are opaque sequential labels. No `user_id` / `job_id` / original problem id
-  is published. (Verified: 0 residual address strings across all 245 files.)
+  is published. (Verified: 0 residual address strings across all 264 files.)
 
 The masking preserves what the benchmark measures — relative geometry, clustering, and travel times
 between stops — while destroying the ability to recover a real customer's stop.

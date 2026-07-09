@@ -88,7 +88,7 @@ normalization, documented here for transparency:
 | `etas_options.*` (soft slack) | Instances published as the **hard-constrained** version (soft lateness / overtime / capacity-overload removed), so every solver competes on the same hard problem. | 28 lateness, 36 overtime, 19 cap-overload, 7 squash |
 | `visits[].priority` | All stops treated as **equal priority**. | 9,595 visits had non-default priority |
 | `vehicles[].speed` | Fleet normalized to **uniform speed** (effective time = `distances[i][j]`). | 31 non-unit speed; 24 mixed-speed fleets |
-| `secondary_objective.*` except `minimize_vehicles` | Distance / balance / cluster-overlap objectives dropped; only fleet-size minimization retained. | all 245 |
+| `secondary_objective.*` except `minimize_vehicles` | Distance / balance / cluster-overlap objectives dropped; only fleet-size minimization retained. | all 264 |
 
 ### Fields intentionally excluded
 

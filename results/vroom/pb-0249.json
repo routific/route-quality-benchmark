@@ -1,0 +1,1 @@
+{"instance":"pb-0249","solver":"vroom","routes":[{"vehicle":0,"start_time":28800,"visits":[29,30,26,28,31,32,1,7,0,5,2,6,4,3,33,34,36,35,9,8,10,14,17,22,18,16,21,23,19,15,12,24,25,13,20,11,27]}],"unserved":[],"runtime_ms":12,"meta":{"routes":1,"unassigned":0,"duration":13266,"cost":13266}}

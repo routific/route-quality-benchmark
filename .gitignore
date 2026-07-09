@@ -1,5 +1,9 @@
-# Private provenance / internal inputs — never publish
-tools/_private/
+# Private provenance / internal inputs — never publish.
+# Default-deny everything under tools/ (internal exporters, provenance .ids/.tsv, cluster
+# infra) — re-include only the genuinely-public tools by name. This stays safe even if the
+# internal repo's tooling (which no longer lives under tools/_private/) reaches this tree.
+tools/*
+!tools/vrp_classify.py
 datasets/**/_provenance.private.csv
 
 # Python
