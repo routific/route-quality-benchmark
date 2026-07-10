@@ -1,6 +1,6 @@
 # `public-benchmark` dataset
 
-**245 anonymized, real-world VRP instances** derived from Routific customer delivery problems, each
+**264 anonymized, real-world VRP instances** derived from Routific customer delivery problems, each
 carrying a pre-computed **raw-OSRM** travel-time matrix. This is the routific (customer-derived)
 dataset for the benchmark. Every instance conforms to the
 [Standard Instance contract](../../docs/standard-io-contract.md).
@@ -13,13 +13,17 @@ Instances are segregated by VRP type (classification derived purely from instanc
 | type | count | meaning |
 |---|---:|---|
 | `cvrp`   | 120 | capacity, no time windows |
-| `vrptw`  | 59 | time windows, no capacity |
+| `vrptw`  | 63 | time windows, no capacity |
 | `vrp`    | 46 | multi-vehicle, no capacity/TW |
-| `cvrptw` | 17 | capacity + time windows |
-| `tsp`    | 3  | single vehicle, no capacity/TW |
-| **total** | **245** | |
+| `cvrptw` | 23 | capacity + time windows |
+| `tsp`    | 12 | single vehicle, no capacity/TW |
+| **total** | **264** | |
 
-Size spread: **29** instances < 50 visits, **73** with 50–200, **143** with 200+.
+Size spread: **37** instances < 50 visits, **84** with 50–200, **143** with 200+.
+
+> The set grew in two batches after the original 200: **+45 extra-large instances** (2026-07-01) and
+> **+19 single-vehicle instances** (`pb-0246`–`pb-0264`, 2026-07-08, 31–120 stops; classified as
+> `tsp`, `vrptw`, or `cvrptw` by their constraints).
 
 ```
 public-benchmark/
@@ -53,10 +57,10 @@ has_time_windows, has_pdp, minimize_vehicles`. Contains **no** customer/job link
 ## Anonymization
 
 - **Coordinates** are **donut-geomasked** (displaced from their true location; density-adaptive
-  radius, 50 m–3 km) — see the dataset methodology doc (Slice 6).
+  radius, 50 m–3 km) — see the [methodology doc](../../docs/methodology.md).
 - **Street addresses removed.** The Standard Instance format carries coordinates only; the address
   field that existed in the source instances is dropped by construction (verified: 0 residual
-  address strings across all 245 files).
+  address strings across all 264 files).
 - **Identifiers anonymized.** Vehicle/visit ids are sequential labels (`veh-N`, `visit-N`); instance
   names are opaque (`pb-XXXX`). No `user_id` / `job_id` / `original_problem_id` is published.
 
@@ -74,7 +78,7 @@ routing-algorithm quality from ETA methodology.
 
 Matrices were computed with **OSRM `v6.0.0`** (`project-osrm/osrm-backend`, Contraction Hierarchies,
 `--max-table-size 8000`) over **Geofabrik `<region>-latest.osm.pbf`** extracts. The dataset spans six
-regions; extract build dates (read from Routific's `kstaging` OSRM deployments):
+regions; extract build dates (read from the OSRM deployments that produced the matrices):
 
 | region | instances\* | OSM extract build date |
 |---|---:|---|
@@ -85,10 +89,12 @@ regions; extract build dates (read from Routific's `kstaging` OSRM deployments):
 | south-america     |  2 | 2026-06-25 |
 | asia              |  1 | 2026-06-25 |
 
-\*bucketed by first-stop coordinate. Matrices were generated during dataset construction (~2026-06-24/25)
-via map-service → the regional OSRM above. Europe's 2026-05-10 extract predates construction (exact
-match); the other regions were rebuilt on 2026-06-25 (the construction window), so their
-extract-vs-matrix alignment is approximate to that date. Re-fetching the same Geofabrik region extract
+\*bucketed by first-stop coordinate; the table covers the original 200-instance batch. Matrices were
+generated during dataset construction (~2026-06-24/25) via map-service → the regional OSRM above.
+Europe's 2026-05-10 extract predates construction (exact match); the other regions were rebuilt on
+2026-06-25 (the construction window), so their extract-vs-matrix alignment is approximate to that
+date. The later batches (+45 on 2026-07-01, +19 on 2026-07-08) had their matrices computed through
+the same OSRM setup as deployed on those dates. Re-fetching the same Geofabrik region extract
 reproduces the routing.
 
 ## Simplifications

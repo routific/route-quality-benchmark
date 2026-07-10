@@ -15,7 +15,8 @@ them. Runtime is intentionally **not** compared yet (see Caveats).
 ## Metrics (all lower-is-better)
 
 Computed in [`compute_metrics.py`](compute_metrics.py). A *leg* is the straight segment between two
-consecutive stops (using the anonymized coordinates); travel time uses the raw-OSRM `distances` matrix.
+consecutive stops (using the anonymized coordinates); two legs *cross* when they properly intersect —
+shared endpoints and collinear touches don't count. Travel time uses the raw-OSRM `distances` matrix.
 
 | Metric | Definition |
 |---|---|
@@ -28,16 +29,19 @@ consecutive stops (using the anonymized coordinates); travel time uses the raw-O
 | **Route-duration variance** | **Range** (max − min) of route working time (travel + service + idle) across routes. Seconds. |
 | **Idle / wait time** | Total time drivers wait for a stop's time window to open. Seconds. |
 
-These are **ported to match Routific's internal `engine-bench analyze compute`** (`fitness.rs` +
-`solution_timeline.rs`): workload imbalance is `deviation_from_balance` (balances stop *count* per
-route); route-duration variance is `max_duration_variance` (a max−min *range*, despite the name).
-*Working time* of a route = travel + service + idle. Segment crossings use a proper
-segment-intersection test (shared endpoints / collinear touches don't count).
+These definitions **match the analyzer Routific uses internally** to evaluate its own engine, so the
+numbers published here are computed the same way Routific measures itself.
 
-**Route adjacency.** Inter-route crossings are counted only between **adjacent** routes — the
-nearest-neighbor `VehicleAdjacency` graph (each visit links its route to the route of its nearest visit
-in a *different* route; the graph is then made fully connected). Fidelity gap: the internal
-`reroute_incompatible_edges` refinement (type/capacity/TW compatibility) is not yet ported.
+**Why a sum *and* a max?** The sum measures total tangling across the plan; the max flags the single
+worst leg. One leg slicing repeatedly through neighboring routes (usually the signature of a single
+misassigned stop) is a glaring map defect that a diffuse sum can't distinguish from mild boundary
+overlap.
+
+**Route adjacency.** Inter-route crossings are counted only between **adjacent** routes: each visit
+links its route to the route of its nearest visit in a *different* route, and the graph is then made
+fully connected. One refinement in Routific's internal analyzer — rerouting adjacency edges away from
+route pairs that are incompatible by vehicle type, capacity, or time windows — is not replicated
+here, so crossing counts can differ slightly from Routific's internal figures.
 
 **Applicability.** Inter-route crossings, workload imbalance, and route-duration variance are only
 meaningful when a solution uses ≥2 routes, so those means and win-rates are taken over **multi-route
@@ -61,7 +65,7 @@ metrics measure directly:
 
 Travel time is reported alongside so quality is never read in isolation from cost. The full narrative +
 citations (incl. the 2025 *C&OR* driver-acceptance work and the Amazon human-similarity angle) live in
-the methodology write-up (Slice 6).
+the [methodology write-up](../docs/methodology.md).
 
 ## Caveats
 

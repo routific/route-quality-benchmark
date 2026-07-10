@@ -1,22 +1,23 @@
 """Route-quality metrics computed from a (Standard Instance, Standard Solution) pair.
 
-Ported to match Routific's internal `engine-bench analyze compute`
-(engine-lib/interfaces/src/fitness.rs + routing-engine-api/model/src/solution_timeline.rs
-+ model/src/utils.rs). Everything is recomputed from the two JSON files alone, so results are
-independently reproducible. See analysis/README.md for definitions + grounding (Rossit et al. 2019).
+The definitions match the analyzer Routific uses internally to evaluate its own engine, so the
+public numbers line up with the internal ones. Everything is recomputed from the two JSON files
+alone, so results are independently reproducible. See analysis/README.md for definitions +
+grounding (Rossit et al. 2019).
 
-Faithfully ported:
+Metrics:
   travel_time              Σ per-route travel time over matrix legs (incl. depot legs)
   idle_time                Σ waiting for time windows to open
   num_vehicles             non-empty routes
-  workload_imbalance       Σ over routes |route.num_visits − average_route_length|   (fitness.deviation_from_balance)
-  route_duration_variance  max(service+travel+idle) − min(...) over routes           (fitness.max_duration_variance; a RANGE)
+  workload_imbalance       Σ over routes |route.num_visits − average_route_length|
+  route_duration_variance  max(service+travel+idle) − min(...) over routes (a RANGE, despite the name)
   intra_route_crossings    self-crossings: legs = depot→first + visit→visit + last→depot;
                            non-consecutive pairs, excluding the first↔last wrap
-  inter_route_crossings_*  visit→visit legs only, counted only between ADJACENT routes (VehicleAdjacency)
+  inter_route_crossings_*  visit→visit legs only, counted only between ADJACENT routes
 
-Known fidelity gap: VehicleAdjacency ports the nearest-neighbor rule + full-connect, but not
-`reroute_incompatible_edges` (type/capacity/tw compatibility rerouting).
+Known fidelity gap vs the internal analyzer: route adjacency implements the nearest-neighbor rule
++ full-connect, but not the internal refinement that reroutes adjacency edges away from route pairs
+that are incompatible by vehicle type, capacity, or time windows.
 """
 from __future__ import annotations
 
@@ -42,7 +43,7 @@ def _dedup(seq):
     return out
 
 
-def _pt(instance, loc_id):  # (lat, lng), matching the internal Coord order
+def _pt(instance, loc_id):  # (lat, lng)
     c = instance["locations"][loc_id]
     return (c["lat"], c["lng"])
 
@@ -53,7 +54,7 @@ def _segments(pts):
 
 # --------------------------------------------------------------------------- adjacency
 def _vehicle_adjacency(instance, routes):
-    """Port of VehicleAdjacency::new (nearest-neighbor + full-connect; no incompat-reroute).
+    """Route adjacency: nearest-neighbor rule + full-connect (no incompatibility rerouting).
 
     routes: list of (vehicle_idx, permutation) for NON-EMPTY routes. Returns a list of
     neighbor-index sets over those routes.

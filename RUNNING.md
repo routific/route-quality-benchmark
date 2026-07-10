@@ -27,7 +27,7 @@ git clone https://github.com/routific/route-quality-benchmark.git
 cd route-quality-benchmark
 ```
 
-The dataset is already included under `datasets/public-benchmark/` (200 instances, gzipped). Peek at one:
+The dataset is already included under `datasets/public-benchmark/` (264 instances, gzipped). Peek at one:
 
 ```bash
 python3 -c "import json,gzip; d=json.load(gzip.open('datasets/public-benchmark/cvrp/pb-0002.json.gz','rb')); print(d['type'], len(d['visits']),'visits',len(d['vehicles']),'vehicles')"
@@ -68,7 +68,7 @@ Routific's per-problem runtime is published in the `results/routific/<instance>.
 (`runtime_ms`), so the budgets are **fully reproducible from public data** — nothing hidden:
 
 ```bash
-python3 run_benchmark.py --sample 200 --budget-from-routific
+python3 run_benchmark.py --sample 264 --budget-from-routific
 ```
 
 `--budget-from-routific` reads each budget straight from the published Routific results, so anyone runs
@@ -115,10 +115,10 @@ results/
 Each solution file is a [Standard Solution](docs/standard-io-contract.md): per-route ordered visit
 indices + unserved + `runtime_ms`.
 
-## 6. Full 200-instance run
+## 6. Full-dataset run (264 instances)
 
 ```bash
-python3 run_benchmark.py --sample 200 --time-limit-ms 5000
+python3 run_benchmark.py --sample 264 --time-limit-ms 5000
 python3 analysis/analyze.py
 ```
 
