@@ -16,7 +16,9 @@ python3 analysis/fair_compare.py --exclude jsprit
 
 > Metric definitions and their grounding in the visual-attractiveness literature are in
 > [`docs/methodology.md`](methodology.md); solver coverage and caveats in
-> [`docs/results-status.md`](results-status.md).
+> [`docs/results-status.md`](results-status.md). Every raw number behind the aggregates below —
+> one row per instance, all metrics × all solvers — is in
+> [`results/all-results.md`](../results/all-results.md).
 
 ## How the comparison is set up
 
@@ -127,4 +129,5 @@ Because every solver ran on identical hardware, runtimes are comparable:
 ```bash
 python3 analysis/fair_compare.py --exclude jsprit   # the gated comparison above
 python3 analysis/analyze.py                         # per-metric means + win-rate, all solvers
+python3 analysis/build_all_results.py               # regenerate results/all-results.md (every raw number)
 ```

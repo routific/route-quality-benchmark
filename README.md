@@ -21,6 +21,7 @@ fleet utilization.
 | `run_benchmark.py` | One-command batch runner (all solvers over a set of instances). |
 | [`analysis/`](analysis/) | The comparison analyzer + metric definitions. |
 | [`results/`](results/) | Published solver results (the four competitors + Routific's); re-runs and analysis output land here too. |
+| [`results/all-results.md`](results/all-results.md) | **Every raw number in one table** — one row per instance, all metrics × all solvers. |
 | [`RUNNING.md`](RUNNING.md) | **Step-by-step guide** to run the solvers + analysis end to end. |
 | [`docs/results.md`](docs/results.md) | **The findings** — Routific vs. the open-source solvers, compared fairly (equal coverage, equal fleet). |
 | [`docs/methodology.md`](docs/methodology.md) | How the dataset was built (anonymization, selection) and why the metrics were chosen. |

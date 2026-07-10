@@ -14,14 +14,10 @@ __pycache__/
 # VROOM dumps each solved request as <ts>_<uuid>.json into the mounted conf dir — runtime junk
 solvers/vroom/conf/*.json
 
-# Only the published solver columns ship under results/. Everything else is internal —
-# the per-instance / forced-min-vehicles LS+GA components that feed routific/, the
-# same-hardware cluster runs (*-cluster), the budget reruns (*-fmv), the explore-level
-# experiments (vroom-e2/e3/e4), and generated _analysis/ tables. Ignore all of results/,
-# then re-include exactly the five published columns.
 results/*
 !results/routific/
 !results/vroom/
 !results/ortools/
 !results/pyvrp/
 !results/jsprit/
+!results/all-results.md
