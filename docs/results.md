@@ -93,6 +93,20 @@ the set — single-vehicle (TSP) solutions have no between-routes structure:
 Once fleet size is matched, **travel is within ~1%** — effectively a tie (against OR-Tools Routific is
 even fractionally shorter). Routific pays essentially nothing on distance for its route-quality gains.
 
+The table above is **pairwise** (Routific vs. each competitor on that pair's own equal-coverage /
+equal-fleet subset, so the instance set differs per column). Restricting further to the **143
+instances where all four solvers simultaneously match both unserved count and vehicle count** gives one common subset to sum total travel time over:
+
+| solver | total travel time (s) | mean travel time (s) |
+|---|--:|--:|
+| VROOM | 9,782,765 | 68,411 |
+| PyVRP | 9,882,312 | 69,107 |
+| Routific | 9,942,964 | 69,531 |
+| OR-Tools | 10,000,543 | 69,934 |
+
+Same conclusion as the pairwise view: all four solvers are close to each other in total
+travel once coverage and fleet size are held fixed simultaneously across the board.
+
 ## 4. Runtime (same hardware — 6-vCPU c2-standard-8)
 
 Because every solver ran on identical hardware, runtimes are comparable:

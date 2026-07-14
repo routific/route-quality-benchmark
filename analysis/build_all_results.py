@@ -67,7 +67,6 @@ def main() -> int:
             "type": inst.get("type", ""),
             "stops": len(inst.get("visits", [])),
             "vehicles": len(inst.get("vehicles", [])),
-            "min_veh": bool(inst.get("minimize_vehicles")),
         }
         metrics[name] = {}
         for s in SOLVERS:
@@ -83,8 +82,7 @@ def main() -> int:
     r1 = ['<th rowspan="2">Instance</th>',
           '<th rowspan="2">Type</th>',
           '<th rowspan="2">Stops</th>',
-          '<th rowspan="2">Vehicles avail.</th>',
-          '<th rowspan="2">Min-veh</th>']
+          '<th rowspan="2">Vehicles avail.</th>']
     for _, label, _fmt in METRICS:
         r1.append(f'<th colspan="{ncols_metric}">{label}</th>')
     parts.append("<tr>" + "".join(r1) + "</tr>")
@@ -103,8 +101,7 @@ def main() -> int:
         cells = [f"<td>{name}</td>",
                  f"<td>{p['type']}</td>",
                  f'<td align="right">{p["stops"]}</td>',
-                 f'<td align="right">{p["vehicles"]}</td>',
-                 f'<td align="center">{"✓" if p["min_veh"] else ""}</td>']
+                 f'<td align="right">{p["vehicles"]}</td>']
         for key, _label, fmt in METRICS:
             for s in SOLVERS:
                 m = metrics[name][s]
@@ -127,7 +124,7 @@ Regenerate with `python3 analysis/build_all_results.py`.
 
 - **{len(names)} instances.** Solver coverage: {coverage}. Blank cells = solver has no result for that instance.
 - **Descriptors:** `Type` (tsp/cvrp/cvrptw/vrp/vrptw), `Stops` (visits), `Vehicles avail.` (fleet size in the
-  instance, not routes used), `Min-veh` (✓ = `minimize_vehicles` objective set).
+  instance, not routes used).
 - **Routes used** = non-empty routes; **Unserved** = orders left unassigned. Read those two together on
   min-veh instances — a route "saved" by dropping an order is not a saved route.
 - The crossing / imbalance / route-duration-variance metrics are only meaningful for multi-route

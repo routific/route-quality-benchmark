@@ -132,6 +132,21 @@ def main() -> int:
         low = sum(1 for n in sub if M[(ref, n)]["travel_time"] < M[(s, n)]["travel_time"])
         print(f"  {ref} vs {s:<9} (n={len(sub):3d}):  travel {tr:>9,.0f} / {tf:>9,.0f}  "
               f"ratio {tr/tf:4.2f}   {ref} lower on {low}/{len(sub)}")
+
+    # ---- Stage 4: total travel where ALL solvers simultaneously match coverage AND fleet ----
+    all_eq = [n for n in common
+              if len({M[(s, n)]["num_unserved"] for s in solvers}) == 1
+              and len({M[(s, n)]["num_vehicles"] for s in solvers}) == 1]
+    print("\n" + "=" * 68 +
+          f"\nSTAGE 4 — TOTAL TRAVEL, ALL SOLVERS simultaneously EQUAL unserved AND EQUAL # vehicles "
+          f"({len(all_eq)} instances)\n" + "=" * 68)
+    if all_eq:
+        print("solver".ljust(12) + "total travel".rjust(16) + "mean travel".rjust(16))
+        for s in solvers:
+            vals = [M[(s, n)]["travel_time"] for n in all_eq]
+            print(s.ljust(12) + f"{sum(vals):>16,.0f}" + f"{mean(vals):>16,.1f}")
+    else:
+        print("  no instances where all solvers simultaneously match coverage and fleet")
     return 0
 
 
