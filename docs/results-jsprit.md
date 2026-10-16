@@ -13,9 +13,9 @@ python3 analysis/fair_compare.py --exclude vroom,pyvrp,ortools   # leaves routif
 ```
 
 The comparison is gated the same way as the main results (coverage → quality at equal coverage →
-travel at equal fleet). jsprit is an anytime solver given the same `max(2 s, 2 × Routific's runtime)` budget rule as the
-other competitors (see [`results-status.md`](results-status.md#solve-budgets)); on these small
-instances that's mostly the 2-second floor.
+travel at equal fleet). jsprit is an anytime solver. jsprit was run at 2× the runtime of the Routific column current at the time of its run (on these
+small instances mostly the 2-second floor); the budgets in
+[`results/competitor-budgets.tsv`](../results/competitor-budgets.tsv) apply to PyVRP and OR-Tools.
 
 ## 1. Coverage (unserved stops) — 145 instances
 

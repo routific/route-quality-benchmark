@@ -68,8 +68,9 @@ Every per-problem budget is published in
 Routific runtime it was computed from), and `run_benchmark.py --sample 264 --budget-map
 results/competitor-budgets.tsv` re-runs the competitors at exactly those budgets. PyVRP and OR-Tools
 ran on `c2-standard-8` nodes from the same pool, one solve per node; the published columns were
-produced on 2026-10-16. The reported runtimes include the solver's model build and PyVRP's post-solve repair, so they can sit slightly above the budget. jsprit, compared separately, runs under the
-same rule (mostly the 2-second floor on its ≤400-stop instances). VROOM has no budget (fixed effort).
+produced on 2026-10-16. The reported runtimes include the solver's model build and PyVRP's post-solve repair, so they can sit slightly above the budget. jsprit, compared separately, was run at 2× the
+runtime of the Routific column current at the time of its run (on its ≤400-stop instances mostly the
+2-second floor); the budgets in the table apply to PyVRP and OR-Tools. VROOM has no budget (fixed effort).
 See the Solve-budgets section of [`RUNNING.md`](../RUNNING.md).
 
 ## Caveats
