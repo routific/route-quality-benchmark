@@ -72,9 +72,9 @@ the [methodology write-up](../docs/methodology.md).
 - **Runtime is shown, on equal hardware.** Every solver ran on the same 6-vCPU `c2-standard-8` node, so
   runtimes are directly comparable (see the Runtime section of [`docs/results.md`](../docs/results.md)).
   The anytime solvers (PyVRP/OR-Tools) are *given* a fixed per-problem budget (`max(2 s, 2 × the
-  current Routific runtime)`, rerun in October 2026; the two largest instances, pb-0089 and pb-0102,
-  keep their July solutions at 2× the July Routific runtime, about 0.8× the current one —
-  [`results/competitor-budgets.tsv`](../results/competitor-budgets.tsv)), so their times are set by
+  current Routific runtime)`, rerun in October 2026 —
+  [`results/competitor-budgets.tsv`](../results/competitor-budgets.tsv); the two longest-running instances,
+  pb-0089 and pb-0102, have no PyVRP/OR-Tools result), so their times are set by
   construction; VROOM (no budget, fixed `explore`) is the only independent competitor
   clock. jsprit is excluded from the timed comparison (its number includes the HTTP round-trip; it caps
   by iterations).

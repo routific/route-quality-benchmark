@@ -81,8 +81,8 @@ def main() -> int:
 
     # Per-problem competitor budget. The official run uses --budget-map results/competitor-budgets.tsv:
     # the budgets the published PyVRP/OR-Tools columns ran at, max(2s, 2 x the current Routific runtime on
-    # that problem), except pb-0089/pb-0102 (July solutions, 2 x the July runtime). --budget-from-routific
-    # applies the rule to the runtimes in results/routific/<name>.json (i.e. the current Routific column).
+    # that problem). --budget-from-routific applies the same rule to the runtimes in
+    # results/routific/<name>.json (i.e. the current Routific column).
     budgets = {}
     if args.budget_from_routific:
         for f in glob.glob(os.path.join(REPO, "results", "routific", "*.json")):

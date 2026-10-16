@@ -11,8 +11,8 @@ The dataset has **264 instances**. Published coverage per solver:
 | solver | results | notes |
 |---|---:|---|
 | **Routific** | 264 / 264 | complete — engine not runnable from this repo, solutions bundled |
-| **OR-Tools** | 264 / 264 | complete |
-| **PyVRP** | 264 / 264 | complete (see repair note) |
+| **OR-Tools** | 262 / 264 | no result for the two longest-running instances, `pb-0089` / `pb-0102` (see [Solve budgets](#solve-budgets)) |
+| **PyVRP** | 262 / 264 | as OR-Tools (see also the repair note) |
 | **VROOM** | 260 / 264 | a few of the very largest exceed the time cap (see note) |
 | **jsprit** | 145 / 264 | skips instances > 400 stops by default |
 
@@ -39,7 +39,8 @@ other solvers' numbers. Run `analysis/analyze.py --exclude jsprit` to compare ov
   July budget and at the current 2× budget).
 - **jsprit** auto-skips instances above 400 stops (it doesn't scale into a comparable budget); override
   with `--force` on its harness if you want to run them anyway.
-- **OR-Tools** and **PyVRP** cover the full 264 including the largest (3,000+ stop) instances.
+- **OR-Tools** and **PyVRP** cover 262 of 264, including the 3,000+ stop instances; the two longest-running
+  instances (largest budgets: 1.3 h and 1.9 h), `pb-0089` and `pb-0102`, have no result (see [Solve budgets](#solve-budgets)).
 
 ## The Routific column
 
@@ -89,14 +90,10 @@ to problem difficulty, not a flat one:
 > **budget(problem) = max(2000 ms, 2 × the current Routific runtime on that problem)**
 
 PyVRP and OR-Tools were rerun at these budgets in October 2026, on the same `c2-standard-8` pool, after
-the Routific column was refreshed. The only exception is the two largest instances, `pb-0089` and
-`pb-0102`, which keep their July solutions, run at 2× the **July** Routific runtime (0.54 h and 0.77 h —
-about 0.8× the current Routific runtime on those two). Every per-problem budget is published in
-[`results/competitor-budgets.tsv`](../results/competitor-budgets.tsv) (`pb_name`, `budget_ms`, the
-Routific runtime it was computed from, and `source`: `2x-routific-oct2026`, or `2x-routific-jul2026` for
-the two exceptions), and `run_benchmark.py --budget-map results/competitor-budgets.tsv` re-runs the
-competitors at exactly those budgets. Over all 264 problems the budgets total 1.84× the current Routific
-runtime (2× everywhere except the two exceptions).
+the Routific column was refreshed. Every per-problem budget is published in
+[`results/competitor-budgets.tsv`](../results/competitor-budgets.tsv) (`pb_name`, `budget_ms`, and the
+Routific runtime it was computed from), and `run_benchmark.py --budget-map results/competitor-budgets.tsv`
+re-runs the competitors at exactly those budgets. The two longest-running instances, `pb-0089` and `pb-0102` (2,255 and 2,380 visits), have no PyVRP/OR-Tools result and are excluded from the competitor comparisons (Routific and VROOM still cover them).
 
 The reported runtimes sit at their budgets: OR-Tools within 0.3% on every instance, PyVRP within 2.5% on
 every instance but one — PyVRP's reported runtime includes its post-solve repair of dropped visits, so
