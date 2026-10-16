@@ -59,21 +59,33 @@ python3 run_benchmark.py --keep-up                      # leave services running
 
 ### Solve budgets (how the official comparison is run)
 
-The anytime solvers (PyVRP, OR-Tools, jsprit) are given a **per-problem** budget, not a flat one, so
-each competitor gets time proportional to how hard the problem is:
+The anytime solvers (PyVRP, OR-Tools, jsprit) are given a fixed **per-problem** budget, not a flat
+one, so each competitor gets time proportionate to how hard the problem is:
 
 > **budget(problem) = max(2000 ms, 2 × Routific's runtime on that problem)**
 
-Routific's per-problem runtime is published in the `results/routific/<instance>.json` files
-(`runtime_ms`), so the budgets are **fully reproducible from public data** — nothing hidden:
+The published competitor columns were run at the budgets in
+[`results/competitor-budgets.tsv`](results/competitor-budgets.tsv), so the official reproduction is:
 
 ```bash
-python3 run_benchmark.py --sample 264 --budget-from-routific
+python3 run_benchmark.py --sample 264 --budget-map results/competitor-budgets.tsv
 ```
 
-`--budget-from-routific` reads each budget straight from the published Routific results, so anyone runs
-the competitors under the exact same time budgets we did. (VROOM has no time budget — it uses a fixed
-`explore` level — so the budget never applies to it.)
+The table has one row per instance (`pb_name`, `budget_ms`, `routific_july_runtime_ms`). Its budgets
+apply the rule above to the per-problem runtimes of the **July 2026 Routific column** — the published
+column at the time the competitors were run. The Routific column in `results/routific/` has since been
+refreshed and its runtimes are ~42% higher in total, so these budgets work out to ~1.4× the current
+Routific runtime in aggregate; deriving budgets from the current `results/routific/` files instead
+would give the competitors more time than the published runs had.
+
+`--budget-from-routific` applies the same rule to whatever Routific column is in `results/routific/`
+(reading each file's `runtime_ms`) — the way to build a budget table from a Routific column:
+
+```bash
+python3 run_benchmark.py --sample 264 --budget-from-routific   # budgets from the current results/routific/
+```
+
+(VROOM has no time budget — it uses a fixed `explore` level — so the budget never applies to it.)
 
 > **jsprit skips instances with >400 stops by default** (it doesn't scale past that in a comparable
 > budget). Override with `--force` on the per-solver command if you really want it.

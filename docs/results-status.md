@@ -41,25 +41,72 @@ other solvers' numbers. Run `analysis/analyze.py --exclude jsprit` to compare ov
   with `--force` on its harness if you want to run them anyway.
 - **OR-Tools** and **PyVRP** cover the full 264 including the largest (3,000+ stop) instances.
 
+## The Routific column
+
+`results/routific/` is the per-instance **best-of** two engine runs over all 264 instances, picked by
+the objective hierarchy serve → vehicles → travel time (`meta.best_of` in each file records which):
+
+| component | solver | hardware | benchmark run | instances |
+|---|---|---|---|--:|
+| LS | local-search VRP | CPU | 2487 | 264 / 264 |
+| GA | genetic algorithm | GPU | 2486 | 258 / 264 |
+
+- Both runs: engine branch `force-min-vehicles` (develop `587b94e2` + `minimize_vehicles` forced on —
+  the fleet-minimizing configuration), 2026-10-15.
+- **Split:** GA is the best-of on 212 instances, LS on 52.
+- **The GA run skips the 6 single-vehicle TSPs `pb-0259`..`pb-0264`**, so those use the LS solution
+  directly (`meta.only = "ls"`).
+- Coverage: 264 / 264 instances have a solution.
+
+### What changed vs the previous column
+
+The previous `results/routific/` (July 2026) was a best-of of earlier engine runs (96 LS / 168 GA).
+Totals of Routific against itself over all 264 instances (lower is better for every metric):
+
+| metric | previous | current | change |
+|---|--:|--:|--:|
+| Total travel time (s) | 35,992,671 | 35,208,717 | −2.2% |
+| Crossings between routes (sum) | 2,691 | 1,043 | **−61.2%** |
+| Crossings between routes (max) | 461 | 315 | −31.7% |
+| Crossings within a route | 22,275 | 21,930 | −1.5% |
+| Workload imbalance | 15,880 | 15,913 | +0.2% |
+| Route-duration variance | 2,135,383 | 2,027,655 | −5.0% |
+| Idle / wait (s) | 1,078,352 | 1,056,876 | −2.0% |
+| Unserved stops | 7,327 | 7,301 | −0.4% |
+| Vehicles | 4,246 | 4,236 | −0.2% |
+| **Runtime (ms)** | 30,649,370 | 43,620,701 | **+42.3%** |
+
+The quality gains (most visibly crossings between routes) come with a **~42% higher total runtime**
+(mean 116,096 → 165,230 ms per instance; median 14,992 → 22,688 ms). Against the competitors (see
+[`results.md`](results.md)): the equal-coverage set moved 215 → 214 instances, Routific's mean
+crossings between routes 12.5 → 4.8, best-or-tied on crossings 86% → 90%, and the all-four
+equal-fleet travel subset 143 → 144 instances (Routific mean travel 69,531 → 68,561 s). The competitor
+columns and their budgets are unchanged (see [Solve budgets](#solve-budgets)).
+
 ## Solve budgets
 
-The anytime solvers (PyVRP, OR-Tools, jsprit) are given a **per-problem** budget, not a flat one:
+The anytime solvers (PyVRP, OR-Tools, jsprit) are given a fixed **per-problem** budget, proportionate
+to problem difficulty, not a flat one:
 
-> **budget(problem) = max(2000 ms, 2 × Routific's runtime on that problem)**
+> **budget(problem) = max(2000 ms, 2 × Routific's runtime on that problem)**, with Routific's runtime
+> taken from the July 2026 Routific column (the previous column, see [above](#what-changed-vs-the-previous-column))
 
-Routific's per-problem runtime is published in the `results/routific/*.json` files, so the budgets are
-**fully reproducible from public data** — `run_benchmark.py --budget-from-routific` reads them
-straight from those files. VROOM has no budget (fixed effort). See the Solve-budgets section of
-[`RUNNING.md`](../RUNNING.md).
+The budgets are published per problem in
+[`results/competitor-budgets.tsv`](../results/competitor-budgets.tsv) (`pb_name`, `budget_ms`, and the
+July Routific runtime each was computed from), and
+`run_benchmark.py --budget-map results/competitor-budgets.tsv` re-runs the competitors at exactly those
+budgets. The current Routific column takes ~42% longer in total than the July one, so the budgets work
+out to about 1.4× the current Routific runtime in aggregate — under 2× on roughly half of the problems,
+and less time than Routific on ~30 of them. VROOM has no budget (fixed effort). See the Solve-budgets
+section of [`RUNNING.md`](../RUNNING.md).
 
 ## Caveats
 
 - **The Routific column** is the engine run in its **fleet-minimizing configuration** (it minimizes
-  the number of vehicles), best-of its two solvers per instance. It covers all 264 instances. (On the
-  19 single-vehicle instances added 2026-07-08, the GA component completed only 13 — the remaining 6
-  use the LS solution directly.) It's precomputed and bundled because the engine isn't runnable from
-  this repo; to reproduce it in an isolated environment, [contact Routific](https://routific.com).
-- **Coverage is a near-tie** between Routific and VROOM (mean unserved 25.57 vs 25.43 on the common set);
+  the number of vehicles), best-of its two solvers per instance — details in
+  [the Routific column](#the-routific-column). It's precomputed and bundled because the engine isn't
+  runnable from this repo; to reproduce it in an isolated environment, [contact Routific](https://routific.com).
+- **Coverage is a near-tie** between Routific and VROOM (mean unserved 25.47 vs 25.43 on the common set);
   PyVRP and OR-Tools trail on the hardest large instances. See [`docs/results.md`](results.md).
 - **Runtime IS compared** — every solver ran on identical hardware (6-vCPU `c2-standard-8`), so runtimes
   are directly comparable; see the Runtime section of [`docs/results.md`](results.md).

@@ -13,52 +13,54 @@ python3 analysis/fair_compare.py --exclude vroom,pyvrp,ortools   # leaves routif
 ```
 
 The comparison is gated the same way as the main results (coverage → quality at equal coverage →
-travel at equal fleet). jsprit is an anytime solver given the same `2 × Routific's runtime` budget as
-the other competitors; on these small instances that's mostly the 2-second floor.
+travel at equal fleet). jsprit is an anytime solver given the same `max(2 s, 2 × Routific's runtime)` budget rule as the
+other competitors (computed from the July 2026 Routific column and published in
+[`results/competitor-budgets.tsv`](../results/competitor-budgets.tsv) — see the runtime note in
+[`results.md`](results.md)); on these small instances that's mostly the 2-second floor.
 
 ## 1. Coverage (unserved stops) — 145 instances
 
 | | Routific | jsprit |
 |---|--:|--:|
-| mean unserved | **4.03** | 6.75 |
-| fewest-unserved win-rate | **100%** | 81% |
+| mean unserved | **4.07** | 6.75 |
+| fewest-unserved win-rate | **99%** | 81% |
 
-Routific serves more stops than jsprit. This leaves **117 instances where both serve identically** —
+Routific serves more stops than jsprit. This leaves **116 instances where both serve identically** —
 the basis for the quality comparison.
 
-## 2. Route quality at equal coverage (117 instances)
+## 2. Route quality at equal coverage (116 instances)
 
-Mean (lower is better), with Routific's win-rate. The between-routes metrics only apply to the 78
+Mean (lower is better), with Routific's win-rate. The between-routes metrics only apply to the 77
 multi-route instances in the set:
 
 | metric | **Routific** | jsprit | Routific win-rate |
 |---|--:|--:|--:|
-| Number of vehicles | **3.5** | 3.7 | **100%** |
-| **Crossings between routes (sum)** | **1.1** | 14.4 | **100%** |
-| **Crossings between routes (max)** | **0.6** | 3.5 | **99%** |
-| Crossings within a route | **12.8** | 17.1 | 78% |
-| **Workload imbalance** | **24.9** | 34.9 | **78%** |
-| **Route-duration variance** | **7,775** | 13,922 | **71%** |
-| **Idle / wait (s)** | **2,355** | 4,047 | **99%** |
+| Number of vehicles | **3.4** | 3.6 | **100%** |
+| **Crossings between routes (sum)** | **0.5** | 14.4 | **100%** |
+| **Crossings between routes (max)** | **0.4** | 3.5 | **100%** |
+| Crossings within a route | **12.6** | 17.2 | 84% |
+| **Workload imbalance** | **24.3** | 34.6 | **77%** |
+| **Route-duration variance** | **7,817** | 13,468 | **66%** |
+| **Idle / wait (s)** | **2,368** | 4,082 | **99%** |
 
-Routific has **~13× fewer crossings between routes** than jsprit and is best on **100%** of instances
+Routific has **~30× fewer crossings between routes** than jsprit and is best on **100%** of instances
 for that metric — jsprit produces markedly more tangled routes. Routific is also lower on idle time
 (99%), workload imbalance, route-duration variance, and fleet size.
 
-## 3. Travel time, at equal coverage *and* equal fleet (95 instances)
+## 3. Travel time, at equal coverage *and* equal fleet (92 instances)
 
 | Routific vs | instances | travel ratio (Routific ÷ jsprit) |
 |---|--:|--:|
-| jsprit | 95 | **0.91** |
+| jsprit | 92 | **0.90** |
 
-Unlike VROOM / PyVRP / OR-Tools — where Routific ties or gives up ~1% on travel — **against jsprit
-Routific is ~9% *shorter*** on travel, and lower on **93 of 95** head-to-heads.
+Unlike VROOM / PyVRP / OR-Tools — where Routific is within ~±1–2% on travel — **against jsprit
+Routific is ~10% *shorter*** on travel, and lower on **91 of 92** head-to-heads.
 
 ## Reading it
 
 > On the small-to-medium problems jsprit can handle, **Routific is strictly better — fewer unserved
 > stops, an order of magnitude fewer crossings, more even and less-idle routes, a smaller fleet, and
-> ~9% less travel.** jsprit is not competitive on this dataset, and it can't run the large instances at
+> ~10% less travel.** jsprit is not competitive on this dataset, and it can't run the large instances at
 > all.
 
 ## Caveats

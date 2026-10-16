@@ -118,8 +118,11 @@ Routific's internal analyzer** so the public numbers line up with the internal o
   dimensions.
 - **Runtime is compared on equal hardware.** Every solver ran on the same 6-vCPU `c2-standard-8` node,
   so runtimes are directly comparable — see the Runtime section of [`docs/results.md`](results.md).
-  (The anytime solvers get 2× Routific's runtime as budget, so their times are 2× Routific by
-  construction; VROOM, with no budget, is the only independent competitor clock.)
+  (The anytime solvers' times are set by a fixed per-problem budget, proportionate to problem
+  difficulty: `max(2 s, 2 × Routific's runtime)`, computed from the earlier (July 2026) Routific
+  column — ~1.4× the current Routific runtime in aggregate. The budgets are published in
+  [`results/competitor-budgets.tsv`](../results/competitor-budgets.tsv). VROOM, with no budget, is the
+  only independent competitor clock.)
 - **No ETA/traffic modeling.** Raw OSRM only — quality is judged on the routing decisions, not the
   travel-time model.
 
@@ -128,7 +131,8 @@ Routific's internal analyzer** so the public numbers line up with the internal o
 ## 3. Reproducing it
 
 The competitors are fully reproducible from this repo: `run_benchmark.py` solves every instance in
-Docker and `analysis/analyze.py` recomputes the tables (see [`RUNNING.md`](../RUNNING.md)). Routific's
+Docker at the published per-problem budgets ([`results/competitor-budgets.tsv`](../results/competitor-budgets.tsv))
+and `analysis/analyze.py` recomputes the tables (see [`RUNNING.md`](../RUNNING.md)). Routific's
 own engine is **not runnable from this repo**; its results are published as Standard Solutions so its
 metrics can be recomputed exactly like any competitor's — see
 [`docs/results-status.md`](results-status.md) for coverage and [the README](../README.md#running-the-routific-engine)

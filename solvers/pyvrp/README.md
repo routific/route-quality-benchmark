@@ -29,8 +29,8 @@ returns a [Standard Solution](../../docs/standard-io-contract.md).
 ## Modeling notes
 
 - **Time budget.** PyVRP is anytime; `run.py --time-limit-ms N` sets the solve budget (default is
-  size-scaled). Reproducing published numbers requires the same per-problem budgets (published with the
-  results).
+  size-scaled). Reproducing published numbers requires the same per-problem budgets (published in
+  [`results/competitor-budgets.tsv`](../../results/competitor-budgets.tsv); `run_benchmark.py --budget-map` applies them).
 - **`minimize_vehicles`.** A per-vehicle `fixed_cost` (`PYVRP_FIXED_COST`, default 15000) consolidates
   routes. It stays **below** the serve-a-visit prize (`PYVRP_PRIZE_FLOOR`, default 20000), so PyVRP
   never drops a servable stop to save a vehicle: **serve > vehicles > travel time**.

@@ -1,1 +1,1 @@
-{"instance":"pb-0249","solver":"routific","routes":[{"vehicle":0,"start_time":28800,"visits":[29,30,26,28,31,32,1,7,0,5,2,6,4,3,33,34,36,35,8,10,9,14,17,19,23,21,16,22,18,15,13,25,24,12,20,11,27]}],"unserved":[],"runtime_ms":63,"meta":{"benchmark_id":2138,"best_of":"ls"}}
+{"instance":"pb-0249","solver":"routific","routes":[{"vehicle":0,"start_time":28800,"visits":[29,30,26,28,31,32,1,7,0,5,2,6,4,3,33,34,36,35,9,8,10,14,17,19,23,21,16,22,18,15,13,25,24,12,20,11,27]}],"unserved":[],"runtime_ms":69,"meta":{"benchmark_id":2487,"best_of":"ls"}}
