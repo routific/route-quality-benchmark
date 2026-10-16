@@ -30,8 +30,7 @@ returns a [Standard Solution](../../docs/standard-io-contract.md).
 
 - **Time budget.** PyVRP is anytime; `run.py --time-limit-ms N` sets the solve budget (default is
   size-scaled). Reproducing published numbers requires the same per-problem budgets (published in
-  [`results/competitor-budgets.tsv`](../../results/competitor-budgets.tsv): `max(2 s, 2 ×` the current Routific
-  runtime`)`, rerun October 2026; the two longest-running instances, pb-0089/pb-0102, have no published result.
+  [`results/competitor-budgets.tsv`](../../results/competitor-budgets.tsv): `max(2 s, 2 ×` Routific's runtime`)`;
   `run_benchmark.py --budget-map` applies them).
 - **`minimize_vehicles`.** A per-vehicle `fixed_cost` (`PYVRP_FIXED_COST`, default 15000) consolidates
   routes. It stays **below** the serve-a-visit prize (`PYVRP_PRIZE_FLOOR`, default 20000), so PyVRP

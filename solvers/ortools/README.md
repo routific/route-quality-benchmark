@@ -29,8 +29,7 @@ docker compose down
 
 - **Time budget.** `run.py --time-limit-ms N` (default size-scaled). Reproducing published numbers
   requires the same per-problem budgets (published in
-  [`results/competitor-budgets.tsv`](../../results/competitor-budgets.tsv): `max(2 s, 2 ×` the current Routific
-  runtime`)`, rerun October 2026; the two longest-running instances, pb-0089/pb-0102, have no published result.
+  [`results/competitor-budgets.tsv`](../../results/competitor-budgets.tsv): `max(2 s, 2 ×` Routific's runtime`)`;
   `run_benchmark.py --budget-map` applies them).
 - **`minimize_vehicles`.** `SetFixedCostOfAllVehicles(ORTOOLS_FIXED_COST, default 1e8)` consolidates
   routes. It sits **below** the visit drop penalty (`priority × 1e9`), so OR-Tools never drops a

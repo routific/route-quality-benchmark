@@ -80,9 +80,9 @@ def main() -> int:
     args = ap.parse_args()
 
     # Per-problem competitor budget. The official run uses --budget-map results/competitor-budgets.tsv:
-    # the budgets the published PyVRP/OR-Tools columns ran at, max(2s, 2 x the current Routific runtime on
-    # that problem). --budget-from-routific applies the same rule to the runtimes in
-    # results/routific/<name>.json (i.e. the current Routific column).
+    # the budgets the published PyVRP/OR-Tools columns ran at, max(2s, 2 x Routific's runtime on that
+    # problem). --budget-from-routific applies the same rule to the runtimes in
+    # results/routific/<name>.json.
     budgets = {}
     if args.budget_from_routific:
         for f in glob.glob(os.path.join(REPO, "results", "routific", "*.json")):

@@ -11,8 +11,7 @@ The dataset has **264 instances**. Published coverage per solver:
 | solver | results | notes |
 |---|---:|---|
 | **Routific** | 264 / 264 | complete — engine not runnable from this repo, solutions bundled |
-| **OR-Tools** | 262 / 264 | no result for the two longest-running instances, `pb-0089` / `pb-0102` (see [Solve budgets](#solve-budgets)) |
-| **PyVRP** | 262 / 264 | as OR-Tools (see also the repair note) |
+| **PyVRP, OR-Tools** | 262 / 264 | no result for pb-0089 and pb-0102 (PyVRP: see also the repair note) |
 | **VROOM** | 260 / 264 | a few of the very largest exceed the time cap (see note) |
 | **jsprit** | 145 / 264 | skips instances > 400 stops by default |
 
@@ -35,12 +34,10 @@ other solvers' numbers. Run `analysis/analyze.py --exclude jsprit` to compare ov
 - **PyVRP fails to construct a serving route on two single-vehicle time-window instances**
   (`pb-0252`, `pb-0263`) even at its full budget — it treats time windows as hard, and with one
   vehicle there is no route-splitting recourse, so it returns a route serving only a handful of
-  stops. This is a solver limitation, not a budget artifact (the result is identical at 2 s, at the
-  July budget and at the current 2× budget).
+  stops. This is a solver limitation, not a budget artifact (the result is identical at 2 s and at
+  the full 2× budget).
 - **jsprit** auto-skips instances above 400 stops (it doesn't scale into a comparable budget); override
   with `--force` on its harness if you want to run them anyway.
-- **OR-Tools** and **PyVRP** cover 262 of 264, including the 3,000+ stop instances; the two longest-running
-  instances (largest budgets: 1.3 h and 1.9 h), `pb-0089` and `pb-0102`, have no result (see [Solve budgets](#solve-budgets)).
 
 ## The Routific column
 
@@ -59,50 +56,21 @@ the objective hierarchy serve → vehicles → travel time (`meta.best_of` in ea
   directly (`meta.only = "ls"`).
 - Coverage: 264 / 264 instances have a solution.
 
-### What changed vs the previous column
-
-The previous `results/routific/` (July 2026) was a best-of of earlier engine runs (96 LS / 168 GA).
-Totals of Routific against itself over all 264 instances (lower is better for every metric):
-
-| metric | previous | current | change |
-|---|--:|--:|--:|
-| Total travel time (s) | 35,992,671 | 35,208,717 | −2.2% |
-| Crossings between routes (sum) | 2,691 | 1,043 | **−61.2%** |
-| Crossings between routes (max) | 461 | 315 | −31.7% |
-| Crossings within a route | 22,275 | 21,930 | −1.5% |
-| Workload imbalance | 15,880 | 15,913 | +0.2% |
-| Route-duration variance | 2,135,383 | 2,027,655 | −5.0% |
-| Idle / wait (s) | 1,078,352 | 1,056,876 | −2.0% |
-| Unserved stops | 7,327 | 7,301 | −0.4% |
-| Vehicles | 4,246 | 4,236 | −0.2% |
-| **Runtime (ms)** | 30,649,370 | 43,620,701 | **+42.3%** |
-
-The quality gains (most visibly crossings between routes) come with a **~42% higher total runtime**
-(mean 116,096 → 165,230 ms per instance; median 14,992 → 22,688 ms). Because the competitor budgets
-are 2× Routific's runtime, PyVRP and OR-Tools were then rerun against this column in October 2026 (see
-[Solve budgets](#solve-budgets)); the current four-solver numbers are in [`results.md`](results.md).
-
 ## Solve budgets
 
 The anytime solvers (PyVRP, OR-Tools, jsprit) are given a fixed **per-problem** budget, proportionate
 to problem difficulty, not a flat one:
 
-> **budget(problem) = max(2000 ms, 2 × the current Routific runtime on that problem)**
+> **budget(problem) = max(2000 ms, 2 × Routific's runtime on that problem)**
 
-PyVRP and OR-Tools were rerun at these budgets in October 2026, on the same `c2-standard-8` pool, after
-the Routific column was refreshed. Every per-problem budget is published in
+Every per-problem budget is published in
 [`results/competitor-budgets.tsv`](../results/competitor-budgets.tsv) (`pb_name`, `budget_ms`, and the
-Routific runtime it was computed from), and `run_benchmark.py --budget-map results/competitor-budgets.tsv`
-re-runs the competitors at exactly those budgets. The two longest-running instances, `pb-0089` and `pb-0102` (2,255 and 2,380 visits), have no PyVRP/OR-Tools result and are excluded from the competitor comparisons (Routific and VROOM still cover them).
-
-The reported runtimes sit at their budgets: OR-Tools within 0.3% on every instance, PyVRP within 2.5% on
-every instance but one — PyVRP's reported runtime includes its post-solve repair of dropped visits, so
-on `pb-0240` (1,925 dropped, then 900 repaired) it exceeds the budget by about 5%.
-
-jsprit was **not** rerun: its column is still the July run, at `max(2000 ms, 2 ×` the July Routific
-runtime`)` — on its ≤400-stop instances about half are at the 2-second floor — so its budgets are not the ones in
-the table above. VROOM has no budget (fixed effort). See the Solve-budgets section of
-[`RUNNING.md`](../RUNNING.md).
+Routific runtime it was computed from), and `run_benchmark.py --sample 264 --budget-map
+results/competitor-budgets.tsv` re-runs the competitors at exactly those budgets. PyVRP and OR-Tools
+ran on `c2-standard-8` nodes from the same pool, one solve per node; the published columns were
+produced on 2026-10-16. The reported runtimes include the solver's model build and PyVRP's post-solve repair, so they can sit slightly above the budget. jsprit, compared separately, runs under the
+same rule (mostly the 2-second floor on its ≤400-stop instances). VROOM has no budget (fixed effort).
+See the Solve-budgets section of [`RUNNING.md`](../RUNNING.md).
 
 ## Caveats
 

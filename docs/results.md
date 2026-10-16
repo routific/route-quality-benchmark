@@ -33,19 +33,15 @@ raw average of any metric is misleading. This comparison is **gated** so like is
 
 The competitors are given every advantage, so this is conservative for Routific:
 
-- **Same hardware.** Every solver ran on a **6-vCPU `c2-standard-8`** node — the same class Routific's
-  own engine runs on — so nothing here is a hardware artifact.
+- **Same hardware.** Every solver ran on a **6-vCPU `c2-standard-8`** node from the same pool, one solve
+  per node — the same class Routific's own engine runs on — so nothing here is a hardware artifact.
 - **VROOM at max search** — `explore: 4`, dropping to `explore: 3` on the largest instances (>500
   stops), where `explore: 4` exceeds the 40-min cap. Quality is flat across explore levels, so this
   doesn't move the comparison — it only affects a couple percent of runtime.
 - **PyVRP and OR-Tools each get a fixed per-problem time budget, proportionate to problem
-  difficulty** (they're anytime solvers): `max(2 s, 2 × the current Routific runtime)` on that
-  problem — they were rerun in October 2026 on the same `c2-standard-8` pool against the current
-  Routific column (see [Runtime](#4-runtime-same-hardware--6-vcpu-c2-standard-8)). Every per-problem
-  budget is published in [`results/competitor-budgets.tsv`](../results/competitor-budgets.tsv); see
-  [`RUNNING.md`](../RUNNING.md). The two longest-running instances, `pb-0089` and `pb-0102` (2,255 and 2,380
-  visits), have no PyVRP/OR-Tools result and are excluded from the competitor comparisons (Routific
-  and VROOM still cover them).
+  difficulty** (they're anytime solvers): `max(2 s, 2 × Routific's runtime on that problem)`. Every
+  per-problem budget is published in [`results/competitor-budgets.tsv`](../results/competitor-budgets.tsv);
+  see [`RUNNING.md`](../RUNNING.md).
 - Routific is evaluated in its **fleet-minimizing configuration**; gating travel on **equal fleet
   size** keeps that objective difference from distorting the travel comparison.
 
@@ -129,12 +125,9 @@ set:
 | PyVRP | 266,780 ms | 31,719 ms | anytime — fixed per-problem budget (see below) |
 | OR-Tools | 265,847 ms | 31,633 ms | anytime — fixed per-problem budget (see below) |
 
-> **The PyVRP / OR-Tools budgets.** Each problem has a fixed budget of `max(2 s, 2 × the current
-> Routific runtime)` on that problem (mean 265,823 ms on this set), published per problem in
-> [`results/competitor-budgets.tsv`](../results/competitor-budgets.tsv); both solvers were rerun at
-> these budgets in October 2026 on the same `c2-standard-8` pool. The reported runtimes sit at their budgets: OR-Tools within 0.3% on every instance, PyVRP
-> within 2.5% on every instance but one — PyVRP's reported runtime includes its post-solve repair of
-> dropped visits, so on `pb-0240` (1,925 dropped, then 900 repaired) it exceeds the budget by about 5%.
+> **The PyVRP / OR-Tools budgets.** Each problem has a fixed budget of `max(2 s, 2 × Routific's
+> runtime on that problem)` (mean 265,823 ms on this set), published per problem in
+> [`results/competitor-budgets.tsv`](../results/competitor-budgets.tsv). The reported runtimes include the solver's model build and PyVRP's post-solve repair, so they can sit slightly above the budget.
 
 - **Routific is the fastest on average** (mean 133k ms vs VROOM's 157k; PyVRP/OR-Tools'
   ~266k is their budget, not a natural stopping point). VROOM has no budget: it's quick on small
@@ -156,9 +149,7 @@ set:
 
 - **Coverage is a near-tie** with VROOM; PyVRP/OR-Tools trail on the hardest large instances.
 - **VROOM covers 260/264** — a few of the very largest exceed the time cap even at `explore: 3`.
-  PyVRP and OR-Tools cover 262/264: the two longest-running instances, `pb-0089` and `pb-0102` (2,255 and
-  2,380 visits), have no PyVRP/OR-Tools result and are excluded from the competitor comparisons.
-  Routific covers all 264 (and VROOM covers those two).
+  PyVRP, OR-Tools: 262 / 264 (no result for pb-0089 and pb-0102); Routific covers all 264.
 - **One instance (`pb-0264`) is infeasible for every solver** — its time windows can't be met by a
   single vehicle under the hard-constrained contract, so all four leave essentially all of its stops
   unserved. It's included as-is (unserved is a reported quantity, and the coverage gates handle it).

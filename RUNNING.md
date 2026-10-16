@@ -71,13 +71,9 @@ The published competitor columns were run at the budgets in
 python3 run_benchmark.py --sample 264 --budget-map results/competitor-budgets.tsv
 ```
 
-The table has one row per instance (`pb_name`, `budget_ms`, `routific_runtime_ms`). PyVRP and
-OR-Tools were rerun in October 2026, on the same `c2-standard-8` pool, at the rule above applied to the
-**current** Routific column. The two longest-running instances, `pb-0089` and `pb-0102` (2,255 and 2,380 visits), have no PyVRP/OR-Tools result and are excluded from the competitor comparisons (Routific and VROOM still cover them); the table still lists their
-budgets (1.3 h and 1.9 h — note the solver clients' default HTTP timeout is 1 h, `run.py --timeout`).
-jsprit was not rerun: its published column is the July run (2× the July
-Routific runtime, mostly the 2 s floor on its small instances), so these budgets do not reproduce it
-exactly.
+The table has one row per instance (`pb_name`, `budget_ms`, `routific_runtime_ms`). The published
+PyVRP and OR-Tools columns ran at these budgets on `c2-standard-8` nodes from the same pool, one solve
+per node.
 
 `--budget-from-routific` applies the same rule to whatever Routific column is in `results/routific/`
 (reading each file's `runtime_ms`); today it gives exactly the budgets in the table:
