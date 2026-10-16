@@ -71,16 +71,18 @@ def main() -> int:
     ap.add_argument("--sample", type=int, help="use the first N dataset instances instead of the default")
     ap.add_argument("--time-limit-ms", type=int, help="flat solve budget for pyvrp/ortools/jsprit")
     ap.add_argument("--budget-from-routific", action="store_true",
-                    help="per-problem budget = max(2000, 2 x Routific's runtime) read from the published "
-                         "results/routific/ files — how the official comparison is run (fully reproducible)")
-    ap.add_argument("--budget-map", help="TSV (pb_name/budget_ms) explicit per-problem budget")
+                    help="per-problem budget = max(2000, 2 x Routific's runtime) read from the "
+                         "results/routific/ files — the rule for building budgets from a Routific column")
+    ap.add_argument("--budget-map", help="TSV (pb_name/budget_ms) explicit per-problem budget; the official "
+                                         "run uses results/competitor-budgets.tsv")
     ap.add_argument("--max-stops", type=int, help="skip instances with more than this many visits (all solvers)")
     ap.add_argument("--keep-up", action="store_true", help="leave services running afterwards")
     args = ap.parse_args()
 
-    # Per-problem competitor budget. The official run uses --budget-from-routific: each competitor
-    # gets max(2s, 2 x Routific's own runtime on that problem), read from the PUBLISHED
-    # results/routific/<name>.json — so the budgets are fully reproducible from public data.
+    # Per-problem competitor budget. The official run uses --budget-map results/competitor-budgets.tsv:
+    # the budgets the published PyVRP/OR-Tools columns ran at, max(2s, 2 x Routific's runtime on that
+    # problem). --budget-from-routific applies the same rule to the runtimes in
+    # results/routific/<name>.json.
     budgets = {}
     if args.budget_from_routific:
         for f in glob.glob(os.path.join(REPO, "results", "routific", "*.json")):

@@ -71,8 +71,9 @@ the [methodology write-up](../docs/methodology.md).
 
 - **Runtime is shown, on equal hardware.** Every solver ran on the same 6-vCPU `c2-standard-8` node, so
   runtimes are directly comparable (see the Runtime section of [`docs/results.md`](../docs/results.md)).
-  The anytime solvers (PyVRP/OR-Tools) are *given* 2× Routific's runtime as their budget, so their times
-  are 2× Routific by construction; VROOM (no budget, fixed `explore`) is the only independent competitor
+  The anytime solvers (PyVRP/OR-Tools) are *given* a fixed per-problem budget (`max(2 s, 2 × Routific's
+  runtime on that problem)`, [`results/competitor-budgets.tsv`](../results/competitor-budgets.tsv)), so
+  their times are set by construction; VROOM (no budget, fixed `explore`) is the only independent competitor
   clock. jsprit is excluded from the timed comparison (its number includes the HTTP round-trip; it caps
   by iterations).
 - **Routific** appears as a single column: its published **raw result files** (`results/routific/`) — one

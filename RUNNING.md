@@ -59,21 +59,30 @@ python3 run_benchmark.py --keep-up                      # leave services running
 
 ### Solve budgets (how the official comparison is run)
 
-The anytime solvers (PyVRP, OR-Tools, jsprit) are given a **per-problem** budget, not a flat one, so
-each competitor gets time proportional to how hard the problem is:
+The anytime solvers (PyVRP, OR-Tools, jsprit) are given a fixed **per-problem** budget, not a flat
+one, so each competitor gets time proportionate to how hard the problem is:
 
 > **budget(problem) = max(2000 ms, 2 × Routific's runtime on that problem)**
 
-Routific's per-problem runtime is published in the `results/routific/<instance>.json` files
-(`runtime_ms`), so the budgets are **fully reproducible from public data** — nothing hidden:
+The published competitor columns were run at the budgets in
+[`results/competitor-budgets.tsv`](results/competitor-budgets.tsv), so the official reproduction is:
 
 ```bash
-python3 run_benchmark.py --sample 264 --budget-from-routific
+python3 run_benchmark.py --sample 264 --budget-map results/competitor-budgets.tsv
 ```
 
-`--budget-from-routific` reads each budget straight from the published Routific results, so anyone runs
-the competitors under the exact same time budgets we did. (VROOM has no time budget — it uses a fixed
-`explore` level — so the budget never applies to it.)
+The table has one row per instance (`pb_name`, `budget_ms`, `routific_runtime_ms`). The published
+PyVRP and OR-Tools columns ran at these budgets on `c2-standard-8` nodes from the same pool, one solve
+per node.
+
+`--budget-from-routific` applies the same rule to whatever Routific column is in `results/routific/`
+(reading each file's `runtime_ms`); today it gives exactly the budgets in the table:
+
+```bash
+python3 run_benchmark.py --sample 264 --budget-from-routific   # budgets from the current results/routific/
+```
+
+(VROOM has no time budget — it uses a fixed `explore` level — so the budget never applies to it.)
 
 > **jsprit skips instances with >400 stops by default** (it doesn't scale past that in a comparable
 > budget). Override with `--force` on the per-solver command if you really want it.

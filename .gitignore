@@ -25,3 +25,5 @@ results/*
 !results/pyvrp/
 !results/jsprit/
 !results/all-results.md
+!results/competitor-budgets.tsv
+
