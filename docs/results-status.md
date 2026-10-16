@@ -11,7 +11,7 @@ The dataset has **264 instances**. Published coverage per solver:
 | solver | results | notes |
 |---|---:|---|
 | **Routific** | 264 / 264 | complete — engine not runnable from this repo, solutions bundled |
-| **PyVRP, OR-Tools** | 262 / 264 | no result for pb-0089 and pb-0102 (PyVRP: see also the repair note) |
+| **PyVRP, OR-Tools** | 264 / 264 | complete (PyVRP: see the repair note) |
 | **VROOM** | 260 / 264 | a few of the very largest exceed the time cap (see note) |
 | **jsprit** | 145 / 264 | skips instances > 400 stops by default |
 
@@ -29,8 +29,8 @@ other solvers' numbers. Run `analysis/analyze.py --exclude jsprit` to compare ov
 - **PyVRP** is a hard-constrained solver. On a few instances feasibility *requires* dropping stops (total
   demand exceeds fleet capacity, or shifts are too short to cover every stop). PyVRP can return an
   over-serving **infeasible** best there; the harness **repairs it to feasibility** by dropping the
-  minimal set of violating stops per route (recorded as `meta.repaired` / `repaired_drops` in the
-  solution). Without this, six instances would report every stop as unserved.
+  minimal set of violating stops per route (recorded as `meta.repaired_drops` in the
+  solution). In the published column, 14 instances carry a repair (`meta.repaired_drops` > 0).
 - **PyVRP fails to construct a serving route on two single-vehicle time-window instances**
   (`pb-0252`, `pb-0263`) even at its full budget — it treats time windows as hard, and with one
   vehicle there is no route-splitting recourse, so it returns a route serving only a handful of
