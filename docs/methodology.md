@@ -119,8 +119,10 @@ Routific's internal analyzer** so the public numbers line up with the internal o
 - **Runtime is compared on equal hardware.** Every solver ran on the same 6-vCPU `c2-standard-8` node,
   so runtimes are directly comparable — see the Runtime section of [`docs/results.md`](results.md).
   (The anytime solvers' times are set by a fixed per-problem budget, proportionate to problem
-  difficulty: `max(2 s, 2 × Routific's runtime)`, computed from the earlier (July 2026) Routific
-  column — ~1.4× the current Routific runtime in aggregate. The budgets are published in
+  difficulty: `max(2 s, 2 × the current Routific runtime)` — PyVRP and OR-Tools were rerun at it in
+  October 2026 on the same `c2-standard-8` pool. The only exception is the two largest instances,
+  pb-0089 and pb-0102, which keep their July solutions at 2× the July Routific runtime (0.54 h and
+  0.77 h, about 0.8× the current Routific runtime). Every per-problem budget is published in
   [`results/competitor-budgets.tsv`](../results/competitor-budgets.tsv). VROOM, with no budget, is the
   only independent competitor clock.)
 - **No ETA/traffic modeling.** Raw OSRM only — quality is judged on the routing decisions, not the

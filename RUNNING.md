@@ -71,15 +71,18 @@ The published competitor columns were run at the budgets in
 python3 run_benchmark.py --sample 264 --budget-map results/competitor-budgets.tsv
 ```
 
-The table has one row per instance (`pb_name`, `budget_ms`, `routific_july_runtime_ms`). Its budgets
-apply the rule above to the per-problem runtimes of the **July 2026 Routific column** — the published
-column at the time the competitors were run. The Routific column in `results/routific/` has since been
-refreshed and its runtimes are ~42% higher in total, so these budgets work out to ~1.4× the current
-Routific runtime in aggregate; deriving budgets from the current `results/routific/` files instead
-would give the competitors more time than the published runs had.
+The table has one row per instance (`pb_name`, `budget_ms`, `routific_runtime_ms`, `source`). PyVRP
+and OR-Tools were rerun in October 2026, on the same `c2-standard-8` pool, at the rule above applied to
+the **current** Routific column (`source = 2x-routific-oct2026`). The only exception is the two largest
+instances, `pb-0089` and `pb-0102`, which keep their July solutions, run at 2× the July Routific runtime
+(0.54 h and 0.77 h, about 0.8× the current Routific runtime on those two; `source =
+2x-routific-jul2026`). jsprit was not rerun: its published column is the July run (2× the July
+Routific runtime, mostly the 2 s floor on its small instances), so these budgets do not reproduce it
+exactly.
 
 `--budget-from-routific` applies the same rule to whatever Routific column is in `results/routific/`
-(reading each file's `runtime_ms`) — the way to build a budget table from a Routific column:
+(reading each file's `runtime_ms`). Today it matches the table on every instance except `pb-0089` and
+`pb-0102`, where it gives the full 2× of the current runtime:
 
 ```bash
 python3 run_benchmark.py --sample 264 --budget-from-routific   # budgets from the current results/routific/
